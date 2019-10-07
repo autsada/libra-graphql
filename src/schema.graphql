@@ -5,7 +5,7 @@ type Query {
     sequenceNumber: Int!
   ): SignedTransactionWithProof
   querySentEvents(address: String!): [EventDetail]
-  queryReceiveEvents(address: String!): [EventDetail]
+  queryReceivedEvents(address: String!): [EventDetail]
 }
 
 type Mutation {

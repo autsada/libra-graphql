@@ -92,7 +92,7 @@ const Query = {
   },
 
   // Return received events for specified account address
-  queryReceiveEvents: async (parent, { address }, { libra }, info) => {
+  queryReceivedEvents: async (parent, { address }, { libra }, info) => {
     const res = await libra.queryEventsByAccessPath({
       accessPath: {
         address,
