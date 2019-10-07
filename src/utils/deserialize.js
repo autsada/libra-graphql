@@ -56,7 +56,7 @@ const decodeSignedTxn = signedTxnBytes => {
   const argAddressLen = signedTxnReader.readUInt32LE()
   const receiverAddress = signedTxnReader.readString(argAddressLen, 'hex')
   const argAmount = signedTxnReader.readUInt32LE()
-  const amount = Number(signedTxnReader.readBigUInt64LE())
+  const amount = Number(signedTxnReader.readBigUInt64LE()).toString()
   const max_gas_amount = Number(signedTxnReader.readBigUInt64LE())
   const gas_unit_price = Number(signedTxnReader.readBigUInt64LE())
   const expiration_time = Number(signedTxnReader.readBigUInt64LE())

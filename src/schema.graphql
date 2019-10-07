@@ -157,7 +157,7 @@ type SignedTxnBlob {
   from_account: String
   to_account: String
   amount: String
-  max_gas_mount: Int
+  max_gas_amount: Int
   gas_unit_price: Int
   expiration_time: Int
   sender_public_key: String
