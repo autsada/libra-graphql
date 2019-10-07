@@ -1,0 +1,194 @@
+type Query {
+  queryByAddress(address: String!): Ledger
+  queryBySequenceNumber(
+    address: String!
+    sequenceNumber: Int!
+  ): SignedTransactionWithProof
+  querySentEvents(address: String!): [EventDetail]
+  queryReceiveEvents(address: String!): [EventDetail]
+}
+
+type Mutation {
+  createAccount: User
+  mintCoin(amount: Int!, address: String!): Ledger
+  transferMoney(
+    fromAddress: String!
+    sequenceNumber: Int!
+    toAddress: String!
+    amount: Int!
+    secretKey: String!
+  ): SignedTransactionWithProof
+}
+
+type User {
+  address: String!
+  # mnemonic: String!
+  publicKey: String!
+  secretKey: String!
+}
+
+input AccountStateInput {
+  version: Int!
+  authentication_key: String!
+  balance: String!
+  received_events_count: Int!
+  sent_events_count: Int!
+  sequence_number: Int!
+}
+
+type Ledger {
+  response_items: [ResponseItem]!
+  validator_change_events: [String]!
+  ledger_info_with_sigs: LedgerInfoWithSigs!
+}
+
+type ResponseItem {
+  get_account_state_response: AccountStateResponse
+  get_account_transaction_by_sequence_number_response: AccountTransactionResponse
+  get_events_by_event_access_path_response: EventsResponse
+  get_transactions_response: TransactionsResponse
+  response_items: String
+}
+
+type AccountStateResponse {
+  account_state_with_proof: AccountStateWithProof
+}
+
+type AccountTransactionResponse {
+  signed_transaction_with_proof: SignedTransactionWithProof
+  proof_of_current_sequence_number: AccountStateWithProof
+}
+
+type EventsResponse {
+  events_with_proof: [EventDetail]
+  proof_of_latest_event: AccountStateWithProof
+}
+
+type TransactionsResponse {
+  txn_list_with_proof: TransactionListWithProof
+}
+
+type AccountStateWithProof {
+  version: Int!
+  blob: Blob!
+  proof: Proof
+}
+
+type SignedTransactionWithProof {
+  version: Int
+  signed_transaction: SignedTransaction
+  proof: Proof
+  events: Events
+}
+
+type TransactionListWithProof {
+  transactions: [SignedTransaction]
+  infos: [TransactionInfo]
+  events_for_versions: EventForVersion
+  first_transaction_version: FirstTransactionVersion
+  proof_of_first_transaction: LedgerInfoToTransactionInfoProof
+  proof_of_last_transaction: LedgerInfoToTransactionInfoProof
+}
+
+type EventDetail {
+  transaction_version: Int!
+  event_index: Int!
+  event: Event
+  proof: Proof
+}
+
+type Blob {
+  blob: AccountStateBlob
+}
+
+type Proof {
+  ledger_info_to_transaction_info_proof: LedgerInfoToTransactionInfoProof
+  transaction_info: TransactionInfo
+  transaction_info_to_account_proof: TransactionInfoToAccountProof
+}
+
+type SignedTransaction {
+  signed_txn: SignedTxnBlob
+}
+
+type Events {
+  events: [Event]
+}
+
+type Event {
+  key: String!
+  sequence_number: Int!
+  event_data: EventData
+}
+
+type AccountStateBlob {
+  authentication_key: String!
+  balance: String!
+  received_events_count: Int!
+  sent_events_count: Int!
+  sequence_number: Int!
+}
+
+type LedgerInfoToTransactionInfoProof {
+  non_default_siblings: [String]!
+  bitmap: String!
+}
+
+type TransactionInfo {
+  signed_transaction_hash: String
+  state_root_hash: String
+  event_root_hash: String
+  gas_used: Int
+  major_status: String
+}
+
+type EventForVersion {
+  events_for_version: [Events]
+}
+
+type TransactionInfoToAccountProof {
+  non_default_siblings: [String]!
+  leaf: String!
+  bitmap: String!
+}
+
+type SignedTxnBlob {
+  sequence_number: Int
+  from_account: String
+  to_account: String
+  amount: String
+  max_gas_mount: Int
+  gas_unit_price: Int
+  expiration_time: Int
+  sender_public_key: String
+  signature: String
+}
+
+type EventData {
+  amount: String
+  address: String
+  event_type: String
+}
+
+type LedgerInfoWithSigs {
+  ledger_info: LedgerInfo!
+  signatures: [Signature!]!
+}
+
+type LedgerInfo {
+  version: String!
+  transaction_accumulator_hash: String!
+  consensus_data_hash: String!
+  consensus_block_id: String!
+  epoch_num: String!
+  timestamp_usecs: String!
+}
+
+type Signature {
+  validator_id: String!
+  signature: String!
+}
+
+type FirstTransactionVersion {
+  value: Int
+}
