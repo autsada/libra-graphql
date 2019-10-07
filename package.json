@@ -1,10 +1,11 @@
 {
-  "name": "libra-grpc-graphql",
+  "name": "libra-graphql",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -e js, graphql -x node --inspect src/index.js",
+    "start": "node src/index.js",
+    "development": "nodemon -e js, graphql -x node --inspect src/index.js",
     "playground": "graphql playground --dotenv config/dev.env",
     "dev": "npm-run-all --parallel start playground",
     "test": "node src/test.js"
