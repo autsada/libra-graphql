@@ -44,9 +44,9 @@ type Ledger {
 
 type ResponseItem {
   get_account_state_response: AccountStateResponse
-  get_account_transaction_by_sequence_number_response: AccountTransactionResponse
-  get_events_by_event_access_path_response: EventsResponse
-  get_transactions_response: TransactionsResponse
+  # get_account_transaction_by_sequence_number_response: AccountTransactionResponse
+  # get_events_by_event_access_path_response: EventsResponse
+  # get_transactions_response: TransactionsResponse
   response_items: String
 }
 
