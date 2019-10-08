@@ -186,16 +186,16 @@ class GrpcClient {
             resolve(res)
           }
         })
-      }, 200)
 
-      if (callCount > 60) {
-        clearInterval(query)
-        reject('Please try querying again.')
-      }
+        if (callCount > 30) {
+          clearInterval(query)
+          reject('Please try querying again.')
+        }
+      }, 2000)
     })
   }
 
-  async mintCoin({ amount, address }) {
+  async mintCoins({ amount, address }) {
     try {
       const url = `http://faucet.testnet.libra.org?amount=${amount}&address=${address}`
       const response = await axios({
