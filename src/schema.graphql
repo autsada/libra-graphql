@@ -23,7 +23,7 @@ type Mutation {
 type User {
   address: String!
   # mnemonic: String!
-  publicKey: String!
+  # publicKey: String!
   secretKey: String!
 }
 

@@ -10,13 +10,13 @@ const generateKeyPair = () => {
 
   // Encode publicKey to hex
   const publicKeyBytes = toBuffer(keyPair.publicKey)
-  const publicKey = publicKeyBytes.toString('hex')
+  // const publicKey = publicKeyBytes.toString('hex')
   const secretKey = toBuffer(keyPair.secretKey).toString('hex')
 
   // Generate address (hash public key) --> Update takes Buffer, Uint8Array and String only
   const address = sha3_256.update(publicKeyBytes).hex()
 
-  return { publicKey, secretKey, address }
+  return { address, secretKey }
 }
 
 // Sign message
