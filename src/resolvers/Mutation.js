@@ -13,7 +13,7 @@ const Mutation = {
     return user
   },
 
-  mintCoins: async (parent, { amount, address }, { libra }, info) => {
+  mintCoin: async (parent, { amount, address }, { libra }, info) => {
     // Amount is in libra, so need to convert to micro libra
     const response = await libra.mintCoins({
       amount: amount * 1000000,

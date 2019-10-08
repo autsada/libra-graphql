@@ -187,11 +187,11 @@ class GrpcClient {
           }
         })
 
-        if (callCount > 30) {
+        if (callCount > 60) {
           clearInterval(query)
           reject('Please try querying again.')
         }
-      }, 2000)
+      }, 1000)
     })
   }
 
@@ -238,11 +238,11 @@ class GrpcClient {
           }
         })
 
-        if (callCount > 30) {
+        if (callCount > 60) {
           clearInterval(query)
           reject('Please try querying again.')
         }
-      }, 2000)
+      }, 1000)
     })
   }
 

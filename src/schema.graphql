@@ -10,7 +10,7 @@ type Query {
 
 type Mutation {
   createAccount: User
-  mintCoins(amount: Int!, address: String!): Ledger
+  mintCoin(amount: Int!, address: String!): Ledger
   transferMoney(
     fromAddress: String!
     sequenceNumber: Int!
