@@ -20,6 +20,10 @@ type Mutation {
   ): SignedTransactionWithProof
 }
 
+type Subscription {
+  receivedCoins(receiverAddress: String!): SignedTransactionWithProof
+}
+
 type User {
   address: String!
   # mnemonic: String!
@@ -192,3 +196,12 @@ type Signature {
 type FirstTransactionVersion {
   value: Int
 }
+
+# enum MutationType {
+#   TRANSFERED
+# }
+
+# type ReceivedCoinsSubscriptionPayload {
+#   mutation: MutationType
+#   data: SignedTransactionWithProof
+# }

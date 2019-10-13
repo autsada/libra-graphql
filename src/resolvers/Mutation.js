@@ -32,7 +32,7 @@ const Mutation = {
   transferMoney: async (
     parent,
     { fromAddress, sequenceNumber, toAddress, amount, secretKey },
-    { libra },
+    { libra, pubsub },
     info
   ) => {
     // Amount is in libra, so need to convert to micro libra
@@ -90,6 +90,11 @@ const Mutation = {
       if (to_account === event_data.address) {
         event_data.event_type = 'received'
       }
+    })
+
+    pubsub.publish('TRANSFERED', {
+      receivedCoins: signed_transaction_with_proof
+      // receiverAddress: to_account
     })
 
     return signed_transaction_with_proof
