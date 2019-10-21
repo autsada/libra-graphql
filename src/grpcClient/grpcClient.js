@@ -197,7 +197,8 @@ class GrpcClient {
 
   async mintCoins({ amount, address }) {
     try {
-      const url = `http://faucet.testnet.libra.org?amount=${amount}&address=${address}`
+      // const url = `http://faucet.testnet.libra.org?amount=${amount}&address=${address}`
+      const url = `${this.faucet}?amount=${amount}&address=${address}`
       const response = await axios({
         method: 'post',
         url
