@@ -197,6 +197,10 @@ type FirstTransactionVersion {
   value: Int
 }
 
+type Txn {
+  type: String!
+}
+
 # enum MutationType {
 #   TRANSFERED
 # }
