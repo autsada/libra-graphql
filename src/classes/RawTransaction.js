@@ -3,6 +3,7 @@ const {
   serializeU32,
   serializeU64,
   serializeString,
+  serializeAddress,
   serializeArgAddress,
   serializeArgU64,
   serializeArgString,
@@ -21,7 +22,8 @@ class RawTransaction {
   }
 
   createRawTxnBytes() {
-    const senderBytes = serializeString(this.sender)
+    // const senderBytes = serializeString(this.sender)
+    const senderBytes = serializeAddress(this.sender)
     const sequenceNumberBytes = serializeU64(this.sequence_number)
     const payloadBytes = this.createScriptTxnPayloadBytes(this.payload)
     const maxGasAmountBytes = serializeU64(this.max_gas_amount)
@@ -105,7 +107,8 @@ class RawTransaction {
     const signedTxnBytes = Buffer.concat([rawTxnBytes, publicKey, signature])
 
     return {
-      signed_txn: Uint8Array.from(signedTxnBytes)
+      // signed_txn: Uint8Array.from(signedTxnBytes)
+      txn_bytes: Uint8Array.from(signedTxnBytes)
     }
   }
 }

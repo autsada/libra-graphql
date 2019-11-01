@@ -3,8 +3,6 @@ const grpc = require('grpc')
 const protoLoader = require('@grpc/proto-loader')
 const axios = require('axios')
 
-const { serializeU64 } = require('../utils/lcs')
-
 const protoPath = path.join(__dirname, './', 'proto/admission_control.proto')
 
 class GrpcClient {
@@ -69,7 +67,6 @@ class GrpcClient {
             ])
           )
         },
-        // start_event_seq_num: Uint8Array.from(serializeU64(sequenceNumber)),
         start_event_seq_num: sequenceNumber,
         ascending,
         limit
@@ -95,7 +92,7 @@ class GrpcClient {
 
   createUpdateToLatestLedgerRequest(version, requestedItem) {
     return {
-      client_known_version: Uint8Array.from(serializeU64(version)),
+      client_known_version: version,
       requested_items: [requestedItem]
     }
   }
@@ -108,7 +105,9 @@ class GrpcClient {
       requestItem
     )
 
-    return this.ledgerRequest(updateToLatestLedgerRequest)
+    const ledger = this.ledgerRequest(updateToLatestLedgerRequest)
+
+    return ledger
   }
 
   queryAccountBySequenceNumber({ accountAddress, sequenceNumber }) {
@@ -197,7 +196,6 @@ class GrpcClient {
 
   async mintCoins({ amount, address }) {
     try {
-      // const url = `http://faucet.testnet.libra.org?amount=${amount}&address=${address}`
       const url = `${this.faucet}?amount=${amount}&address=${address}`
       const response = await axios({
         method: 'post',
@@ -213,7 +211,7 @@ class GrpcClient {
   }
 
   createSubmitTransactionRequest(signedTxn) {
-    const submitTxnRequest = { signed_txn: signedTxn }
+    const submitTxnRequest = { transaction: signedTxn }
 
     return submitTxnRequest
   }
@@ -232,16 +230,21 @@ class GrpcClient {
           if (
             res.response_items[0]
               .get_account_transaction_by_sequence_number_response
-              .signed_transaction_with_proof
+              .transaction_with_proof
           ) {
-            clearInterval(query)
-            resolve(res)
+            const {
+              transaction: { transaction }
+            } = res.response_items[0].get_account_transaction_by_sequence_number_response.transaction_with_proof
+            if (transaction) {
+              clearInterval(query)
+              resolve(res)
+            }
           }
         })
 
         if (callCount > 60) {
           clearInterval(query)
-          reject('Please try querying again.')
+          reject('Transfer coins failed, please try querying again.')
         }
       }, 1000)
     })
@@ -258,7 +261,6 @@ class GrpcClient {
       if (ac_status.code !== 'Accepted') {
         throw new Error('Transfer failed. Please try again later')
       }
-
       return this.waitForTxnConfirmation({
         address,
         sequenceNumber

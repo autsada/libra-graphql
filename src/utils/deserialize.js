@@ -46,15 +46,14 @@ const decodeBlob = blob => {
 const decodeSignedTxn = signedTxnBytes => {
   const signedTxnReader = SmartBuffer.fromBuffer(signedTxnBytes)
   const senderAddressLen = signedTxnReader.readUInt32LE()
-  const senderAddress = signedTxnReader.readString(senderAddressLen, 'hex')
+  const senderAddress = signedTxnReader.readString(32, 'hex')
   const sequence_number = Number(signedTxnReader.readBigUInt64LE())
   const payloadType = signedTxnReader.readUInt32LE()
   const codeLen = signedTxnReader.readUInt32LE()
   const code = signedTxnReader.readString(codeLen, 'hex')
   const argsLen = signedTxnReader.readUInt32LE()
   const argAddress = signedTxnReader.readUInt32LE()
-  const argAddressLen = signedTxnReader.readUInt32LE()
-  const receiverAddress = signedTxnReader.readString(argAddressLen, 'hex')
+  const receiverAddress = signedTxnReader.readString(32, 'hex')
   const argAmount = signedTxnReader.readUInt32LE()
   const amount = Number(signedTxnReader.readBigUInt64LE()).toString()
   const max_gas_amount = Number(signedTxnReader.readBigUInt64LE())
@@ -82,19 +81,19 @@ const decodeSignedTxn = signedTxnBytes => {
 
 const decodeTxnInfos = infos => {
   const {
-    signed_transaction_hash,
+    transaction_hash,
     state_root_hash,
     event_root_hash,
     gas_used,
     major_status
   } = infos
 
-  const signedHashReader = SmartBuffer.fromBuffer(signed_transaction_hash)
+  const signedHashReader = SmartBuffer.fromBuffer(transaction_hash)
   const stateRootHashReader = SmartBuffer.fromBuffer(state_root_hash)
   const eventRootHashReader = SmartBuffer.fromBuffer(event_root_hash)
 
   return {
-    signed_transaction_hash: signedHashReader.readString('hex'),
+    transaction_hash: signedHashReader.readString('hex'),
     state_root_hash: stateRootHashReader.readString('hex'),
     event_root_hash: eventRootHashReader.readString('hex'),
     gas_used: +gas_used,
@@ -104,7 +103,7 @@ const decodeTxnInfos = infos => {
 
 const decodeProof = proof => {
   const {
-    ledger_info_to_transaction_info_proof: { non_default_siblings, bitmap },
+    ledger_info_to_transaction_info_proof: { siblings },
     transaction_info,
     transaction_info_to_account_proof
   } = proof
@@ -112,10 +111,7 @@ const decodeProof = proof => {
   if (!transaction_info_to_account_proof) {
     return {
       ledger_info_to_transaction_info_proof: {
-        non_default_siblings: non_default_siblings.map(item =>
-          item.toString('hex')
-        ),
-        bitmap
+        siblings: siblings.map(item => item.toString('hex'))
       },
       transaction_info: decodeTxnInfos(transaction_info)
     }
@@ -123,18 +119,14 @@ const decodeProof = proof => {
 
   return {
     ledger_info_to_transaction_info_proof: {
-      non_default_siblings: non_default_siblings.map(item =>
-        item.toString('hex')
-      ),
-      bitmap
+      siblings: siblings.map(item => item.toString('hex'))
     },
     transaction_info: decodeTxnInfos(transaction_info),
     transaction_info_to_account_proof: {
-      non_default_siblings: transaction_info_to_account_proof.non_default_siblings.map(
-        item => item.toString('hex')
+      siblings: transaction_info_to_account_proof.siblings.map(item =>
+        item.toString('hex')
       ),
-      leaf: transaction_info_to_account_proof.leaf.toString('hex'),
-      bitmap: transaction_info_to_account_proof.bitmap.toString('hex')
+      leaf: transaction_info_to_account_proof.leaf.toString('hex')
     }
   }
 }
@@ -142,8 +134,7 @@ const decodeProof = proof => {
 const decodeEventData = eventData => {
   const eventReader = SmartBuffer.fromBuffer(eventData)
   const amount = Number(eventReader.readBigInt64LE()).toString()
-  const addressLen = eventReader.readUInt32LE()
-  const address = eventReader.readString(addressLen, 'hex')
+  const address = eventReader.readString(32, 'hex')
 
   return {
     amount,
@@ -151,8 +142,25 @@ const decodeEventData = eventData => {
   }
 }
 
+// const decodeTypeTag = typeTag => {
+//   const typeTagReader = SmartBuffer.fromBuffer(typeTag)
+//   const amount = typeTagReader.readUInt32LE()
+
+//   const addressLen = typeTagReader.readString(32, 'hex')
+
+//   const amount1 = typeTagReader.readUInt32LE()
+//   // console.log('Amount -->', amount1)
+//   const address = typeTagReader.readString(32, 'hex')
+//   console.log('Address -->', address)
+
+//   // return {
+//   //   amount,
+//   //   address
+//   // }
+// }
+
 const decodeEvent = event => {
-  const { key, sequence_number, event_data } = event
+  const { key, sequence_number, event_data, type_tag } = event
 
   return {
     key: key.toString('hex'),
@@ -216,26 +224,26 @@ const decodeLedger = ledger => {
     'get_account_transaction_by_sequence_number_response'
   ) {
     const {
-      signed_transaction_with_proof,
+      transaction_with_proof,
       proof_of_current_sequence_number
     } = response_items[0].get_account_transaction_by_sequence_number_response
 
     // Got signed_transaction_with_proof
-    if (signed_transaction_with_proof) {
+    if (transaction_with_proof) {
       const {
         version,
-        signed_transaction: { signed_txn },
+        transaction: { transaction },
         proof,
         events
-      } = signed_transaction_with_proof
+      } = transaction_with_proof
 
       // Deserialize signed txn with proof
       responsedItems = [
         {
           get_account_transaction_by_sequence_number_response: {
-            signed_transaction_with_proof: {
+            transaction_with_proof: {
               version: +version,
-              signed_transaction: { signed_txn: decodeSignedTxn(signed_txn) },
+              transaction: { transaction: decodeSignedTxn(transaction) },
               proof: decodeProof(proof),
               events: {
                 events: events.events.map(event => decodeEvent(event))
@@ -313,7 +321,6 @@ const decodeLedger = ledger => {
     // transactions.reverse()
     const last50Txn = transactions.slice(0, 20)
 
-    console.log(last50Txn)
     responsedItems = [
       {
         get_transactions_response: {

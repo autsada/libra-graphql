@@ -3,7 +3,7 @@ type Query {
   queryBySequenceNumber(
     address: String!
     sequenceNumber: Int!
-  ): SignedTransactionWithProof
+  ): TransactionWithProof
   querySentEvents(address: String!): [EventDetail]
   queryReceivedEvents(address: String!): [EventDetail]
 }
@@ -17,11 +17,11 @@ type Mutation {
     toAddress: String!
     amount: Int!
     secretKey: String!
-  ): SignedTransactionWithProof
+  ): TransactionWithProof
 }
 
 type Subscription {
-  receivedCoins(receiverAddress: String!): SignedTransactionWithProof
+  receivedCoins(receiverAddress: String!): TransactionWithProof
 }
 
 type User {
@@ -59,7 +59,7 @@ type AccountStateResponse {
 }
 
 type AccountTransactionResponse {
-  signed_transaction_with_proof: SignedTransactionWithProof
+  transaction_with_proof: TransactionWithProof
   proof_of_current_sequence_number: AccountStateWithProof
 }
 
@@ -78,15 +78,15 @@ type AccountStateWithProof {
   proof: Proof
 }
 
-type SignedTransactionWithProof {
+type TransactionWithProof {
   version: Int
-  signed_transaction: SignedTransaction
+  transaction: Transaction
   proof: Proof
   events: Events
 }
 
 type TransactionListWithProof {
-  transactions: [SignedTransaction]
+  transactions: [Transaction]
   infos: [TransactionInfo]
   events_for_versions: EventForVersion
   first_transaction_version: FirstTransactionVersion
@@ -111,8 +111,8 @@ type Proof {
   transaction_info_to_account_proof: TransactionInfoToAccountProof
 }
 
-type SignedTransaction {
-  signed_txn: SignedTxnBlob
+type Transaction {
+  transaction: SignedTxnBlob
 }
 
 type Events {
@@ -134,12 +134,11 @@ type AccountStateBlob {
 }
 
 type LedgerInfoToTransactionInfoProof {
-  non_default_siblings: [String]!
-  bitmap: String!
+  siblings: [String]!
 }
 
 type TransactionInfo {
-  signed_transaction_hash: String
+  transaction_hash: String
   state_root_hash: String
   event_root_hash: String
   gas_used: Int
@@ -151,9 +150,8 @@ type EventForVersion {
 }
 
 type TransactionInfoToAccountProof {
-  non_default_siblings: [String]!
+  siblings: [String]!
   leaf: String!
-  bitmap: String!
 }
 
 type SignedTxnBlob {

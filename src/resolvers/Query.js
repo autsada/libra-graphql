@@ -38,19 +38,19 @@ const Query = {
     const accountState = new AccountState(ledger)
 
     const {
-      signed_transaction_with_proof
+      transaction_with_proof
     } = accountState.response_items[0].get_account_transaction_by_sequence_number_response
 
-    if (!signed_transaction_with_proof) {
+    if (!transaction_with_proof) {
       throw new Error(`Transacton not found.`)
     }
 
     const {
-      signed_transaction: {
-        signed_txn: { from_account, to_account }
+      transaction: {
+        transaction: { from_account, to_account }
       },
       events: { events }
-    } = signed_transaction_with_proof
+    } = transaction_with_proof
 
     events.map(event => {
       const { event_data } = event
@@ -64,7 +64,7 @@ const Query = {
       }
     })
 
-    return signed_transaction_with_proof
+    return transaction_with_proof
   },
 
   // Return sent events for specified account address

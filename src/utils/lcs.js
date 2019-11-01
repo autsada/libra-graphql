@@ -45,6 +45,8 @@ const serializeString = (str, encode = 'hex') => {
   return Buffer.concat([prefix, strBuffer])
 }
 
+const serializeAddress = (str, encode = 'hex') => Buffer.from(str, encode)
+
 // Serialization for transaction arguments
 const serializeArgU64 = int64 => {
   const order = serializeU32(0)
@@ -55,7 +57,8 @@ const serializeArgU64 = int64 => {
 
 const serializeArgAddress = address => {
   const order = serializeU32(1)
-  const addressBuffer = serializeString(address)
+  // const addressBuffer = serializeString(address)
+  const addressBuffer = serializeAddress(address)
 
   return Buffer.concat([order, addressBuffer])
 }
@@ -98,6 +101,7 @@ module.exports = {
   serializeU32,
   serializeU64,
   serializeString,
+  serializeAddress,
   serializeArgU64,
   serializeArgAddress,
   serializeArgString,
