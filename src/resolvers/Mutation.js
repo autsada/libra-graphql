@@ -5,8 +5,6 @@ const peerToPeerCode = require('../utils/peerToPeerTxnHex')
 const AccountState = require('../classes/AccountState')
 const { decodeLedger } = require('../utils/deserialize')
 
-const { queryByAddress } = require('./Query')
-
 const Mutation = {
   createAccount: (parent, args, { libra }, info) => {
     const user = new Account(args.email)
@@ -16,9 +14,14 @@ const Mutation = {
   },
 
   mintCoin: async (parent, { amount, address }, { libra }, info) => {
+    // If no amount provide
+    if (!amount || typeof amount !== 'number') {
+      throw new Error('Please provide a valid amount.')
+    }
+
     // If amount is over than 1,000,000 libra, cannot process.
     if (amount * 1000000 > 1000000 * 1000000) {
-      throw new Error('Too much amount, mint coins failed, ')
+      throw new Error('Maximum amount for minting is 1,000,000 libra. ')
     }
 
     // Amount is in libra, so need to convert to micro libra
@@ -42,16 +45,32 @@ const Mutation = {
     { libra, pubsub },
     info
   ) => {
-    // Amount is in libra, so need to convert to micro libra
-    const txnProgram = new Program({
-      code: peerToPeerCode.code,
-      args: [
-        {
-          address: toAddress
-        },
-        { amount: amount * 1000000 }
-      ]
-    })
+    // Check if user provide all arguments
+    if (
+      !fromAddress ||
+      (sequenceNumber === null || sequenceNumber === undefined) ||
+      !toAddress ||
+      !secretKey
+    ) {
+      throw new Error(`Please provide all required arguments.`)
+    }
+
+    // Check if provided arguments are in right format
+    if (typeof fromAddress !== 'string' || fromAddress.length !== 64) {
+      throw new Error(`Please provide a valid sender address.`)
+    }
+
+    if (typeof sequenceNumber !== 'number') {
+      throw new Error(`Please provide a valid sequence number.`)
+    }
+
+    if (typeof toAddress !== 'string' || toAddress.length !== 64) {
+      throw new Error(`Please provide a valid receiver address.`)
+    }
+
+    if (!amount || typeof amount !== 'number' || amount > 1000000) {
+      throw new Error(`Please provide a valid amount.`)
+    }
 
     // Check if the address has account in the testnet, and if it has, check if it has enough balance to transfer
 
@@ -64,6 +83,7 @@ const Mutation = {
       throw new Error(`Account does not exist in libra database.`)
     }
 
+    // Account exists, so checking sequence number and balance
     const accountLedger = decodeLedger(rawAccountState)
     const account = new AccountState(accountLedger)
 
@@ -82,6 +102,19 @@ const Mutation = {
     if (amount * 1000000 > balance) {
       throw new Error('Not enough balance.')
     }
+
+    // Pass all above checks, processing to transfer
+
+    // Amount is in libra, so need to convert to micro libra
+    const txnProgram = new Program({
+      code: peerToPeerCode.code,
+      args: [
+        {
+          address: toAddress
+        },
+        { amount: amount * 1000000 }
+      ]
+    })
 
     const transferTxn = new RawTransaction({
       address: fromAddress,

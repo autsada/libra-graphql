@@ -8,7 +8,6 @@ const decodeBlob = blob => {
   state.path = blobReader.readString(state.pathLen, 'hex')
   state.valueLen = blobReader.readUInt32LE()
   state.authLen = blobReader.readUInt32LE()
-
   const authentication_key = blobReader.readString(state.authLen, 'hex')
   const balance = Number(blobReader.readBigUInt64LE()).toString()
   const delegated_key_rotation_capability =
@@ -29,10 +28,10 @@ const decodeBlob = blob => {
     delegated_key_rotation_capability,
     delegated_withdrawal_capability,
     received_events_count,
-    receiveEventKeyLen,
+    // receiveEventKeyLen,
     receiveEventKey,
     sent_events_count,
-    sendEventKeyLen,
+    // sendEventKeyLen,
     sendEventKey,
     sequence_number
   }
@@ -393,5 +392,6 @@ const decodeLedger = ledger => {
 module.exports = {
   decodeLedger,
   decodeEvent,
-  decodeEvents
+  decodeEvents,
+  decodeBlob
 }

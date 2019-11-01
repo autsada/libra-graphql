@@ -281,10 +281,10 @@ class GrpcClient {
   submitTransaction(txnRequest) {
     return new Promise((resolve, reject) => {
       this.client.SubmitTransaction(txnRequest, (err, res) => {
-        if (err) {
-          reject(err)
+        if (!err) {
+          resolve(res)
         }
-        resolve(res)
+        reject(err)
       })
     })
   }

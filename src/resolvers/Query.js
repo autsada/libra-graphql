@@ -5,6 +5,16 @@ const accessPath = require('../utils/path')
 const Query = {
   // Return the account state (Ledger) of a specified account address
   queryByAddress: async (parent, { address }, { libra }, info) => {
+    // Check if user provide address for query
+    if (!address) {
+      throw new Error(`Please provide account address.`)
+    }
+
+    // Check if provided adress is in correct format
+    if (typeof address !== 'string' || address.length !== 64) {
+      throw new Error(`Please provide a valide account address.`)
+    }
+
     const res = await libra.queryAccountByAddress({
       accountAddress: address
     })
@@ -29,6 +39,19 @@ const Query = {
     { libra },
     info
   ) => {
+    // Check if all arguments provided
+    if (!address || (sequenceNumber === null || sequenceNumber === undefined)) {
+      throw new Error(`Please provide all required arguments.`)
+    }
+
+    if (typeof address !== 'string' || address.length !== 64) {
+      throw new Error(`Please provide a valid account address.`)
+    }
+
+    if (typeof sequenceNumber !== 'number') {
+      throw new Error(`Please provide a valid sequence number.`)
+    }
+
     const res = await libra.queryAccountBySequenceNumber({
       accountAddress: address,
       sequenceNumber: sequenceNumber
@@ -69,6 +92,16 @@ const Query = {
 
   // Return sent events for specified account address
   querySentEvents: async (parent, { address }, { libra }, info) => {
+    // Check if user provide address for query
+    if (!address) {
+      throw new Error(`Please provide account address.`)
+    }
+
+    // Check if provided adress is in correct format
+    if (typeof address !== 'string' || address.length !== 64) {
+      throw new Error(`Please provide a valide account address.`)
+    }
+
     const res = await libra.queryEventsByAccessPath({
       accessPath: {
         address: address,
@@ -93,6 +126,16 @@ const Query = {
 
   // Return received events for specified account address
   queryReceivedEvents: async (parent, { address }, { libra }, info) => {
+    // Check if user provide address for query
+    if (!address) {
+      throw new Error(`Please provide account address.`)
+    }
+
+    // Check if provided adress is in correct format
+    if (typeof address !== 'string' || address.length !== 64) {
+      throw new Error(`Please provide a valide account address.`)
+    }
+
     const res = await libra.queryEventsByAccessPath({
       accessPath: {
         address,
