@@ -1,9 +1,13 @@
+require('dotenv').config({ path: '../../config/dev.env' })
 const nacl = require('tweetnacl')
 const { sha3_256, sha3_512 } = require('js-sha3')
 const toBuffer = require('typedarray-to-buffer')
 const bip39 = require('bip39')
 
 const { salt, accountSalt } = require('../utils/salt')
+console.log(process.env.SALT_BEFORE)
+console.log(process.env.SALT_AFTER)
+console.log(process.env.PORT)
 
 // Generate keyPair
 const generateKeyPair = mnemonic => {

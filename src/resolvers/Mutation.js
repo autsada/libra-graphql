@@ -24,6 +24,11 @@ const Mutation = {
       throw new Error('Maximum amount for minting is 1,000,000 libra. ')
     }
 
+    // If no address, or address is in wrong format
+    if (!address || typeof address !== 'string' || address.length !== 64) {
+      throw new Error('Please provide a valid address.')
+    }
+
     // Amount is in libra, so need to convert to micro libra
     const response = await libra.mintCoins({
       amount: amount * 1000000,

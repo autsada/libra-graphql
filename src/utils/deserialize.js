@@ -392,6 +392,5 @@ const decodeLedger = ledger => {
 module.exports = {
   decodeLedger,
   decodeEvent,
-  decodeEvents,
-  decodeBlob
+  decodeEvents
 }
