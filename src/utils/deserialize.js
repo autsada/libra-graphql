@@ -3,9 +3,20 @@ const { SmartBuffer } = require('smart-buffer')
 const decodeBlob = blob => {
   const blobReader = SmartBuffer.fromBuffer(blob)
   const state = {}
-  state.blobLen = blobReader.readUInt32LE()
+  state.pathCount = blobReader.readUInt32LE()
   state.pathLen = blobReader.readUInt32LE()
   state.path = blobReader.readString(state.pathLen, 'hex')
+
+  if (state.pathCount > 1) {
+    for (let i = 1; i < state.pathCount; i++) {
+      state.addedValueLen = blobReader.readUInt32LE()
+      state.addedValueLen1 = blobReader.readUInt32LE()
+      state.addedValueLen2 = blobReader.readUInt32LE()
+      state.addedPathLen = blobReader.readUInt32LE()
+      state.addedPath = blobReader.readString(state.addedPathLen, 'hex')
+    }
+  }
+
   state.valueLen = blobReader.readUInt32LE()
   state.authLen = blobReader.readUInt32LE()
   const authentication_key = blobReader.readString(state.authLen, 'hex')
@@ -392,5 +403,6 @@ const decodeLedger = ledger => {
 module.exports = {
   decodeLedger,
   decodeEvent,
-  decodeEvents
+  decodeEvents,
+  decodeBlob
 }

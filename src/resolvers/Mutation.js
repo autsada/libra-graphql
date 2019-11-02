@@ -1,3 +1,5 @@
+const toBuffer = require('typedarray-to-buffer')
+
 const Account = require('../classes/Account')
 const RawTransaction = require('../classes/RawTransaction')
 const Program = require('../classes/Program')
@@ -8,7 +10,9 @@ const { decodeLedger } = require('../utils/deserialize')
 const Mutation = {
   createAccount: (parent, args, { libra }, info) => {
     const user = new Account(args.email)
+    // const user = new Account()
     user.generateKeys()
+    // user.generateAddress()
 
     return user
   },
@@ -47,6 +51,7 @@ const Mutation = {
   transferMoney: async (
     parent,
     { fromAddress, sequenceNumber, toAddress, amount, secretKey },
+    // { fromAddress, sequenceNumber, toAddress, amount, mnemonic },
     { libra, pubsub },
     info
   ) => {
@@ -56,6 +61,7 @@ const Mutation = {
       (sequenceNumber === null || sequenceNumber === undefined) ||
       !toAddress ||
       !secretKey
+      // !mnemonic
     ) {
       throw new Error(`Please provide all required arguments.`)
     }
@@ -128,6 +134,7 @@ const Mutation = {
     })
 
     const signedTxn = transferTxn.signTransaction(secretKey)
+    // const signedTxn = transferTxn.signTransaction(mnemonic)
 
     const response = await libra.transferMoney({
       signedTxn,

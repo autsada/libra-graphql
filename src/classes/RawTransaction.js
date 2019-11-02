@@ -10,6 +10,7 @@ const {
   serializeModules
 } = require('../utils/lcs')
 const { sign } = require('../utils/crypto')
+// const { sign } = require('../utils/crypto1')
 
 class RawTransaction {
   constructor({ address, sequenceNumber, program }) {
@@ -88,11 +89,13 @@ class RawTransaction {
   }
 
   signTransaction(secretKey) {
+    // signTransaction(mnemonic) {
     // Serialize rawTransaction
     const rawTxnBytes = this.createRawTxnBytes()
 
     // Sign transaction
     const signTxn = sign({ message: rawTxnBytes, secretKey })
+    // const signTxn = sign({ message: rawTxnBytes, mnemonic })
 
     // Serialize public key
     const publicKeyBytes = toBuffer(signTxn.publicKey)

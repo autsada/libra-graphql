@@ -1,4 +1,5 @@
 const { generateKeyPair } = require('../utils/crypto')
+const { generateAccount } = require('../utils/crypto1')
 
 class Account {
   constructor() {}
@@ -11,6 +12,15 @@ class Account {
     this.secretKey = keys.secretKey
     this.address = keys.address
   }
+
+  // generateAddress() {
+  //   // Generate key pair
+  //   const account = generateAccount()
+
+  //   this.publicKey = account.publicKey
+  //   this.address = account.address
+  //   this.mnemonic = account.mnemonic
+  // }
 }
 
 module.exports = Account

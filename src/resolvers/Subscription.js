@@ -7,7 +7,7 @@ const Subscription = {
         pubsub.asyncIterator('TRANSFERED'),
       (payload, { receiverAddress }) => {
         return (
-          payload.receivedCoins.signed_transaction.signed_txn.to_account ===
+          payload.receivedCoins.transaction.transaction.to_account ===
           receiverAddress
         )
       }
