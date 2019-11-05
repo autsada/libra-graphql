@@ -157,8 +157,9 @@ class GrpcClient {
 
   queryTransactions() {
     const request = this.createGetTransactionRequest({
-      limit: 1000,
-      startVersion: 1
+      limit: 50,
+      startVersion: 0,
+      fetch_events: true
     })
     const requestItem = this.createRequestItem(request)
 
@@ -206,7 +207,7 @@ class GrpcClient {
         return this.waitForMintConfirmation(address)
       }
     } catch (error) {
-      console.log(error)
+      throw new Error(error)
     }
   }
 
@@ -244,7 +245,7 @@ class GrpcClient {
 
         if (callCount > 60) {
           clearInterval(query)
-          reject('Transfer coins failed, please try querying again.')
+          reject('Transfer coins failed, please try again later.')
         }
       }, 1000)
     })

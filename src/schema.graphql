@@ -6,6 +6,7 @@ type Query {
   ): TransactionWithProof
   querySentEvents(address: String!): [EventDetail]
   queryReceivedEvents(address: String!): [EventDetail]
+  queryTransactions: [TransactionWithProof]
 }
 
 type Mutation {
@@ -103,6 +104,7 @@ type TransactionListWithProof {
 
 type EventDetail {
   transaction_version: Int!
+  expiration_time: String
   event_index: Int!
   event: Event
   proof: Proof
@@ -168,7 +170,7 @@ type SignedTxnBlob {
   amount: String
   max_gas_amount: Int
   gas_unit_price: Int
-  expiration_time: Int
+  expiration_time: String
   sender_public_key: String
   signature: String
 }

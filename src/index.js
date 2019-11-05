@@ -1,8 +1,6 @@
 require('dotenv').config({ path: 'config/dev.env' })
 const server = require('./server')
 
-console.log(process.env.NODE_ENV)
-
 server.start(
   {
     port: process.env.PORT

@@ -68,7 +68,7 @@ const decodeSignedTxn = signedTxnBytes => {
   const amount = Number(signedTxnReader.readBigUInt64LE()).toString()
   const max_gas_amount = Number(signedTxnReader.readBigUInt64LE())
   const gas_unit_price = Number(signedTxnReader.readBigUInt64LE())
-  const expiration_time = Number(signedTxnReader.readBigUInt64LE())
+  const expiration_time = Number(signedTxnReader.readBigUInt64LE()).toString()
   const senderPubKeyLen = signedTxnReader.readUInt32LE()
   const sender_public_key = signedTxnReader.readString(senderPubKeyLen, 'hex')
   const signatureLen = signedTxnReader.readUInt32LE()
@@ -321,11 +321,9 @@ const decodeLedger = ledger => {
   if (response_items[0].response_items == 'get_transactions_response') {
     const {
       transactions,
-      infos,
       events_for_versions: { events_for_version },
       first_transaction_version: { value },
-      proof_of_first_transaction: { non_default_siblings, bitmap },
-      proof_of_last_transaction
+      proof: { transaction_infos, ledger_info_to_transaction_info_proof }
     } = response_items[0].get_transactions_response.txn_list_with_proof
 
     // transactions.reverse()
@@ -404,5 +402,6 @@ module.exports = {
   decodeLedger,
   decodeEvent,
   decodeEvents,
-  decodeBlob
+  decodeBlob,
+  decodeSignedTxn
 }
