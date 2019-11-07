@@ -219,6 +219,13 @@ const Query = {
     //     eventType: '/events/'
     //   }
     // })
+    // const res = await libra.queryOneTransaction(4003)
+    // const transaction =
+    //   res.response_items[0].get_transactions_response.txn_list_with_proof
+    //     .transactions[0].transaction
+    // console.log(transaction.toString('hex'))
+    // const txn = decodeSignedTxn(transaction)
+    // console.log(txn)
     // console.log(res)
     // const res = await libra.queryTransactions()
     // const txn =
