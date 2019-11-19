@@ -1,40 +1,65 @@
-const nacl = require('tweetnacl')
-const { sha3_256 } = require('js-sha3')
-const toBuffer = require('typedarray-to-buffer')
+require("dotenv").config({ path: "../../config/dev.env" })
+const EdDSA = require("elliptic").eddsa
+const { sha3_256, sha3_512 } = require("js-sha3")
+const toBuffer = require("typedarray-to-buffer")
+const bip39 = require("bip39")
 
-const { salt } = require('../utils/salt')
+const { salt } = require("./salt")
 
-// Generate key pair
-const generateKeyPair = () => {
-  const keyPair = nacl.sign.keyPair()
+// Generate address and mnemonic
+const generateAccount = () => {
+  const ec = new EdDSA("ed25519")
+  const mnemonic = bip39.generateMnemonic()
 
-  // Encode publicKey to hex
-  const publicKeyBytes = toBuffer(keyPair.publicKey)
-  // const publicKey = publicKeyBytes.toString('hex')
-  const secretKey = toBuffer(keyPair.secretKey).toString('hex')
+  const hashedMnemonic = sha3_512
+    .update(process.env.SALT_BEFORE)
+    .update(mnemonic)
+    .update(process.env.SALT_AFTER)
+    .hex()
 
-  // Generate address (hash public key) --> Update takes Buffer, Uint8Array and String only
+  const keyPair = ec.keyFromSecret(hashedMnemonic)
+
+  const publicKeyBytes = toBuffer(keyPair.getPublic())
+  const publicKey = publicKeyBytes.toString("hex")
+
   const address = sha3_256.update(publicKeyBytes).hex()
 
-  return { address, secretKey }
+  return {
+    address,
+    publicKey,
+    mnemonic
+  }
+}
+
+// From mnemonic to private key
+const generateKeyPair = mnemonic => {
+  const ec = new EdDSA("ed25519")
+
+  const hashedMnemonic = sha3_512
+    .update(process.env.SALT_BEFORE)
+    .update(mnemonic)
+    .update(process.env.SALT_AFTER)
+    .hex()
+
+  const keyPair = ec.keyFromSecret(hashedMnemonic)
+
+  return keyPair
 }
 
 // Sign message
-const sign = ({ message, secretKey }) => {
-  // const salt = Buffer.from('RawTransaction@@$$LIBRA$$@@')
-  const saltBytes = Buffer.from(salt, 'hex')
+const signTxn = ({ message, mnemonic }) => {
+  const keyPair = generateKeyPair(mnemonic)
 
   const hash = sha3_256
-    .update(saltBytes)
+    .update(Buffer.from(salt, "hex"))
     .update(message)
     .digest()
 
-  const signKey = nacl.sign.keyPair.fromSecretKey(
-    Uint8Array.from(Buffer.from(secretKey, 'hex'))
-  )
-  const publicKey = signKey.publicKey
+  const publicKey = Uint8Array.from(toBuffer(keyPair.getPublic()))
 
-  const signature = nacl.sign.detached(Uint8Array.from(hash), signKey.secretKey)
+  const signature = Uint8Array.from(
+    Buffer.from(keyPair.sign(hash).toHex(), "hex")
+  )
 
   return {
     publicKey,
@@ -42,4 +67,8 @@ const sign = ({ message, secretKey }) => {
   }
 }
 
-module.exports = { generateKeyPair, sign }
+module.exports = {
+  generateAccount,
+  generateKeyPair,
+  signTxn
+}

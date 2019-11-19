@@ -1,4 +1,4 @@
-const toBuffer = require('typedarray-to-buffer')
+const toBuffer = require("typedarray-to-buffer")
 const {
   serializeU32,
   serializeU64,
@@ -8,9 +8,9 @@ const {
   serializeArgU64,
   serializeArgString,
   serializeModules
-} = require('../utils/lcs')
-const { sign } = require('../utils/crypto')
-// const { sign } = require('../utils/crypto1')
+} = require("../utils/lcs")
+const { sign } = require("../utils/crypto-nacl")
+const { signTxn } = require("../utils/crypto")
 
 class RawTransaction {
   constructor({ address, sequenceNumber, program }) {
@@ -72,7 +72,7 @@ class RawTransaction {
         }
 
         if (arg.string) {
-          const argStringBytes = serializeArgString(arg.string, 'utf8')
+          const argStringBytes = serializeArgString(arg.string, "utf8")
           payloadBytesArray.push(argStringBytes)
         }
       })
@@ -89,28 +89,49 @@ class RawTransaction {
   }
 
   signTransaction(secretKey) {
-    // signTransaction(mnemonic) {
     // Serialize rawTransaction
     const rawTxnBytes = this.createRawTxnBytes()
 
     // Sign transaction
-    const signTxn = sign({ message: rawTxnBytes, secretKey })
-    // const signTxn = sign({ message: rawTxnBytes, mnemonic })
+    const signedTxn = sign({ message: rawTxnBytes, secretKey })
 
     // Serialize public key
-    const publicKeyBytes = toBuffer(signTxn.publicKey)
+    const publicKeyBytes = toBuffer(signedTxn.publicKey)
     const publicKeyBytesLen = serializeU32(publicKeyBytes.length)
     const publicKey = Buffer.concat([publicKeyBytesLen, publicKeyBytes])
 
     // Serialize signature
-    const signatureBytes = toBuffer(signTxn.signature)
+    const signatureBytes = toBuffer(signedTxn.signature)
     const signatureBytesLen = serializeU32(signatureBytes.length)
     const signature = Buffer.concat([signatureBytesLen, signatureBytes])
 
     const signedTxnBytes = Buffer.concat([rawTxnBytes, publicKey, signature])
 
     return {
-      // signed_txn: Uint8Array.from(signedTxnBytes)
+      txn_bytes: Uint8Array.from(signedTxnBytes)
+    }
+  }
+
+  signTxnWithMnemonic(mnemonic) {
+    // Serialize rawTransaction
+    const rawTxnBytes = this.createRawTxnBytes()
+
+    // Sign transaction
+    const signedTxn = signTxn({ message: rawTxnBytes, mnemonic })
+
+    // Serialize public key
+    const publicKeyBytes = toBuffer(signedTxn.publicKey)
+    const publicKeyBytesLen = serializeU32(publicKeyBytes.length)
+    const publicKey = Buffer.concat([publicKeyBytesLen, publicKeyBytes])
+
+    // Serialize signature
+    const signatureBytes = toBuffer(signedTxn.signature)
+    const signatureBytesLen = serializeU32(signatureBytes.length)
+    const signature = Buffer.concat([signatureBytesLen, signatureBytes])
+
+    const signedTxnBytes = Buffer.concat([rawTxnBytes, publicKey, signature])
+
+    return {
       txn_bytes: Uint8Array.from(signedTxnBytes)
     }
   }

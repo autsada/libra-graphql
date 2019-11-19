@@ -19,13 +19,13 @@ type Mutation {
     amount: Int!
     secretKey: String!
   ): TransactionWithProof
-  # transferMoney(
-  #   fromAddress: String!
-  #   sequenceNumber: Int!
-  #   toAddress: String!
-  #   amount: Int!
-  #   mnemonic: String!
-  # ): TransactionWithProof
+  transferCoins(
+    fromAddress: String!
+    sequenceNumber: Int!
+    toAddress: String!
+    amount: Int!
+    mnemonic: String!
+  ): TransactionWithProof
 }
 
 type Subscription {
@@ -35,8 +35,8 @@ type Subscription {
 type User {
   publicKey: String!
   address: String!
-  # mnemonic: String!
-  secretKey: String!
+  mnemonic: String!
+  # secretKey: String!
 }
 
 input AccountStateInput {

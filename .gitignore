@@ -2,5 +2,7 @@ node_modules
 
 txn.js
 
+test-crypto.js
+
 config/
 

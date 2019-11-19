@@ -1,26 +1,30 @@
-const { generateKeyPair } = require('../utils/crypto')
-const { generateAccount } = require('../utils/crypto1')
+// const { generateKeyPair } = require("../utils/crypto-nacl")
+const { generateAccount } = require("../utils/crypto")
+
+// class Account {
+//   constructor() {}
+
+//   generateKeys() {
+//     // Generate key pair
+//     const keys = generateKeyPair()
+
+//     this.address = keys.address
+//     this.secretKey = keys.secretKey
+//     this.publicKey = keys.publicKey
+//   }
+// }
 
 class Account {
   constructor() {}
 
-  generateKeys() {
+  getAccount() {
     // Generate key pair
-    const keys = generateKeyPair()
+    const keys = generateAccount()
 
-    this.publicKey = keys.publicKey
-    this.secretKey = keys.secretKey
     this.address = keys.address
+    this.mnemonic = keys.mnemonic
+    this.publicKey = keys.publicKey
   }
-
-  // generateAddress() {
-  //   // Generate key pair
-  //   const account = generateAccount()
-
-  //   this.publicKey = account.publicKey
-  //   this.address = account.address
-  //   this.mnemonic = account.mnemonic
-  // }
 }
 
 module.exports = Account
