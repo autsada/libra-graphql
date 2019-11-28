@@ -63,8 +63,9 @@ const Query = {
 
     if (
       !res.response_items[0].get_account_transaction_by_sequence_number_response
+        .transaction_with_proof
     ) {
-      throw new Error(`Account does not exist in libra database.`)
+      throw new Error(`Transaction not found.`)
     }
 
     const ledger = decodeLedger(res)
