@@ -1,6 +1,6 @@
-const AccountState = require('../classes/AccountState')
-const { decodeLedger, decodeSignedTxn } = require('../utils/deserialize')
-const accessPath = require('../utils/path')
+const AccountState = require("../classes/AccountState")
+const { decodeLedger, decodeSignedTxn } = require("../utils/deserialize")
+const accessPath = require("../utils/path")
 
 const Query = {
   // Return the account state (Ledger) of a specified account address
@@ -12,7 +12,7 @@ const Query = {
       }
 
       // Check if provided adress is in correct format
-      if (typeof address !== 'string' || address.length !== 64) {
+      if (typeof address !== "string" || address.length !== 64) {
         throw new Error(`Please provide a valide account address.`)
       }
 
@@ -44,15 +44,15 @@ const Query = {
     info
   ) => {
     // Check if all arguments provided
-    if (!address || (sequenceNumber === null || sequenceNumber === undefined)) {
+    if (!address || sequenceNumber === null || sequenceNumber === undefined) {
       throw new Error(`Please provide all required arguments.`)
     }
 
-    if (typeof address !== 'string' || address.length !== 64) {
+    if (typeof address !== "string" || address.length !== 64) {
       throw new Error(`Please provide a valid account address.`)
     }
 
-    if (typeof sequenceNumber !== 'number') {
+    if (typeof sequenceNumber !== "number") {
       throw new Error(`Please provide a valid sequence number.`)
     }
 
@@ -60,6 +60,12 @@ const Query = {
       accountAddress: address,
       sequenceNumber: sequenceNumber
     })
+
+    if (
+      !res.response_items[0].get_account_transaction_by_sequence_number_response
+    ) {
+      throw new Error(`Account does not exist in libra database.`)
+    }
 
     const ledger = decodeLedger(res)
     const accountState = new AccountState(ledger)
@@ -83,11 +89,11 @@ const Query = {
       const { event_data } = event
 
       if (from_account === event_data.address) {
-        event_data.event_type = 'sent'
+        event_data.event_type = "sent"
       }
 
       if (to_account === event_data.address) {
-        event_data.event_type = 'received'
+        event_data.event_type = "received"
       }
     })
 
@@ -102,7 +108,7 @@ const Query = {
     }
 
     // Check if provided adress is in correct format
-    if (typeof address !== 'string' || address.length !== 64) {
+    if (typeof address !== "string" || address.length !== 64) {
       throw new Error(`Please provide a valide account address.`)
     }
 
@@ -110,7 +116,7 @@ const Query = {
       accessPath: {
         address: address,
         path: accessPath,
-        eventType: '/sent_events_count/'
+        eventType: "/sent_events_count/"
       }
     })
 
@@ -122,7 +128,7 @@ const Query = {
     } = accountState.response_items[0].get_events_by_event_access_path_response
 
     events_with_proof.map(event => {
-      event.event.event_data.event_type = 'sent'
+      event.event.event_data.event_type = "sent"
     })
 
     const txnVersions = events_with_proof.map(
@@ -153,7 +159,7 @@ const Query = {
     }
 
     // Check if provided adress is in correct format
-    if (typeof address !== 'string' || address.length !== 64) {
+    if (typeof address !== "string" || address.length !== 64) {
       throw new Error(`Please provide a valide account address.`)
     }
 
@@ -161,7 +167,7 @@ const Query = {
       accessPath: {
         address,
         path: accessPath,
-        eventType: '/received_events_count/'
+        eventType: "/received_events_count/"
       }
     })
 
@@ -173,7 +179,7 @@ const Query = {
     } = accountState.response_items[0].get_events_by_event_access_path_response
 
     events_with_proof.map(event => {
-      event.event.event_data.event_type = 'received'
+      event.event.event_data.event_type = "received"
     })
 
     const txnVersions = events_with_proof.map(
