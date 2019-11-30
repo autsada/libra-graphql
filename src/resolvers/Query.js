@@ -32,9 +32,7 @@ const Query = {
 
       return accountState
     } catch (error) {
-      throw new Error(
-        "Account does not exist, please check your arguments or try again later."
-      )
+      throw error
     }
   },
 

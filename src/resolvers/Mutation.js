@@ -23,34 +23,38 @@ const Mutation = {
   },
 
   mintCoin: async (parent, { amount, address }, { libra }, info) => {
-    // If no amount provide
-    if (!amount || typeof amount !== "number") {
-      throw new Error("Please provide a valid amount.")
+    try {
+      // If no amount provide
+      if (!amount || typeof amount !== "number") {
+        throw new Error("Please provide a valid amount.")
+      }
+
+      // If amount is over than 1,000,000 libra, cannot process.
+      if (amount * 1000000 > 1000000 * 1000000) {
+        throw new Error("Maximum amount for minting is 1,000,000 libra. ")
+      }
+
+      // If no address, or address is in wrong format
+      if (!address || typeof address !== "string" || address.length !== 64) {
+        throw new Error("Please provide a valid address.")
+      }
+
+      // Amount is in libra, so need to convert to micro libra
+      const response = await libra.mintCoins({
+        amount: amount * 1000000,
+        address: address
+      })
+
+      if (!response) {
+        throw new Error("Mint coins failed, please try again later")
+      }
+      const ledger = decodeLedger(response)
+      const accountState = new AccountState(ledger)
+
+      return accountState
+    } catch (error) {
+      throw error
     }
-
-    // If amount is over than 1,000,000 libra, cannot process.
-    if (amount * 1000000 > 1000000 * 1000000) {
-      throw new Error("Maximum amount for minting is 1,000,000 libra. ")
-    }
-
-    // If no address, or address is in wrong format
-    if (!address || typeof address !== "string" || address.length !== 64) {
-      throw new Error("Please provide a valid address.")
-    }
-
-    // Amount is in libra, so need to convert to micro libra
-    const response = await libra.mintCoins({
-      amount: amount * 1000000,
-      address: address
-    })
-
-    if (!response) {
-      throw new Error("Mint coins failed, please try again later")
-    }
-    const ledger = decodeLedger(response)
-    const accountState = new AccountState(ledger)
-
-    return accountState
   },
 
   // transferMoney: async (

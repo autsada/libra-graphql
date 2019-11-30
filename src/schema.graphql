@@ -11,19 +11,19 @@ type Query {
 
 type Mutation {
   createAccount: User
-  mintCoin(amount: Int!, address: String!): Ledger
+  mintCoin(amount: Float!, address: String!): Ledger
   transferMoney(
     fromAddress: String!
     sequenceNumber: Int!
     toAddress: String!
-    amount: Int!
+    amount: Float!
     secretKey: String!
   ): TransactionWithProof
   transferCoins(
     fromAddress: String!
     sequenceNumber: Int!
     toAddress: String!
-    amount: Int!
+    amount: Float!
     mnemonic: String!
   ): TransactionWithProof
 }
@@ -81,8 +81,8 @@ type TransactionsResponse {
 }
 
 type AccountStateWithProof {
-  version: Int!
-  blob: Blob!
+  version: Int
+  blob: Blob
   proof: Proof
 }
 
@@ -135,11 +135,11 @@ type Event {
 }
 
 type AccountStateBlob {
-  authentication_key: String!
-  balance: String!
-  received_events_count: Int!
-  sent_events_count: Int!
-  sequence_number: Int!
+  authentication_key: String
+  balance: String
+  received_events_count: Int
+  sent_events_count: Int
+  sequence_number: Int
 }
 
 type LedgerInfoToTransactionInfoProof {
