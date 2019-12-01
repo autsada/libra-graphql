@@ -12,13 +12,6 @@ type Query {
 type Mutation {
   createAccount: User
   mintCoin(amount: Float!, address: String!): Ledger
-  transferMoney(
-    fromAddress: String!
-    sequenceNumber: Int!
-    toAddress: String!
-    amount: Float!
-    secretKey: String!
-  ): TransactionWithProof
   transferCoins(
     fromAddress: String!
     sequenceNumber: Int!
