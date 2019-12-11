@@ -32,6 +32,7 @@ const decodeBlob = blob => {
   const sendEventKeyLen = Number(blobReader.readUInt32LE())
   const sendEventKey = blobReader.readString(sendEventKeyLen, "hex")
   const sequence_number = Number(blobReader.readBigUInt64LE())
+  const aa = Number(blobReader.readBigUInt64LE())
 
   state.value = {
     authentication_key,

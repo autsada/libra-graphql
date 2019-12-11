@@ -69,6 +69,7 @@ const Query = {
       ) {
         throw new Error(`Transaction not found.`)
       }
+
       const ledger = decodeLedger(res)
       const accountState = new AccountState(ledger)
 
@@ -80,30 +81,33 @@ const Query = {
         throw new Error(`Transacton not found.`)
       }
 
-      const {
-        transaction: {
-          transaction: { from_account, to_account }
-        },
-        events: { events }
-      } = transaction_with_proof
+      if (transaction_with_proof) {
+        const {
+          transaction: {
+            transaction: { from_account, to_account }
+          },
+          events: { events }
+        } = transaction_with_proof
 
-      events.map(event => {
-        const { event_data } = event
+        events.map(event => {
+          const { event_data } = event
 
-        if (from_account === event_data.address) {
-          event_data.event_type = "sent"
-        }
+          if (from_account === event_data.address) {
+            event_data.event_type = "sent"
+          }
 
-        if (to_account === event_data.address) {
-          event_data.event_type = "received"
-        }
-      })
+          if (to_account === event_data.address) {
+            event_data.event_type = "received"
+          }
+        })
 
-      return transaction_with_proof
+        return transaction_with_proof
+      }
     } catch (error) {
-      throw new Error(
-        `Something went wrong, please check your arguments or try again later.`
-      )
+      // throw new Error(
+      //   `Something went wrong, please check your arguments or try again later.`
+      // )
+      throw Error(error)
     }
   },
 
