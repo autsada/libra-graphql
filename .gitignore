@@ -6,3 +6,5 @@ test-crypto.js
 
 config/
 
+src/grpcClient/proto1/
+
