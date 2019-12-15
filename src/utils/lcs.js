@@ -1,7 +1,7 @@
-const bigInt = require('big-integer')
-const { Uint64LE } = require('int64-buffer')
-const toBuffer = require('any-to-buffer')
-const BufferMaker = require('buffermaker')
+const bigInt = require("big-integer")
+const { Uint64LE } = require("int64-buffer")
+const toBuffer = require("any-to-buffer")
+const BufferMaker = require("buffermaker")
 
 const serializeBoolean = bool => toBuffer(bool)
 
@@ -37,7 +37,7 @@ const serializeU64 = num => {
   return buffer
 }
 
-const serializeString = (str, encode = 'hex') => {
+const serializeString = (str, encode = "hex") => {
   const strBuffer = Buffer.from(str, encode)
   const bufferLen = strBuffer.length
   const prefix = serializeU32(bufferLen)
@@ -45,7 +45,7 @@ const serializeString = (str, encode = 'hex') => {
   return Buffer.concat([prefix, strBuffer])
 }
 
-const serializeAddress = (str, encode = 'hex') => Buffer.from(str, encode)
+const serializeAddress = (str, encode = "hex") => Buffer.from(str, encode)
 
 // Serialization for transaction arguments
 const serializeArgU64 = int64 => {
@@ -65,7 +65,7 @@ const serializeArgAddress = address => {
 
 const serializeArgString = str => {
   const order = serializeU32(2)
-  const strBuffer = serializeString(str, 'utf8')
+  const strBuffer = serializeString(str, "utf8")
 
   return Buffer.concat([order, strBuffer])
 }

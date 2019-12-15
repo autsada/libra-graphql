@@ -8,9 +8,7 @@ const { decodeLedger } = require("../utils/deserialize")
 const Mutation = {
   // createAccount: (parent, args, { libra }, info) => {
   //   const user = new Account(args.email)
-  //   // const user = new Account()
   //   user.generateKeys()
-  //   // user.generateAddress()
 
   //   return user
   // },
@@ -60,14 +58,14 @@ const Mutation = {
   // transferMoney: async (
   //   parent,
   //   { fromAddress, sequenceNumber, toAddress, amount, secretKey },
-  //   // { fromAddress, sequenceNumber, toAddress, amount, mnemonic },
   //   { libra, pubsub },
   //   info
   // ) => {
   //   // Check if user provide all arguments
   //   if (
   //     !fromAddress ||
-  //     (sequenceNumber === null || sequenceNumber === undefined) ||
+  //     sequenceNumber === null ||
+  //     sequenceNumber === undefined ||
   //     !toAddress ||
   //     !secretKey
   //     // !mnemonic
@@ -76,19 +74,19 @@ const Mutation = {
   //   }
 
   //   // Check if provided arguments are in right format
-  //   if (typeof fromAddress !== 'string' || fromAddress.length !== 64) {
+  //   if (typeof fromAddress !== "string" || fromAddress.length !== 64) {
   //     throw new Error(`Please provide a valid sender address.`)
   //   }
 
-  //   if (typeof sequenceNumber !== 'number') {
+  //   if (typeof sequenceNumber !== "number") {
   //     throw new Error(`Please provide a valid sequence number.`)
   //   }
 
-  //   if (typeof toAddress !== 'string' || toAddress.length !== 64) {
+  //   if (typeof toAddress !== "string" || toAddress.length !== 64) {
   //     throw new Error(`Please provide a valid receiver address.`)
   //   }
 
-  //   if (!amount || typeof amount !== 'number' || amount > 1000000) {
+  //   if (!amount || typeof amount !== "number" || amount > 1000000) {
   //     throw new Error(`Please provide a valid amount.`)
   //   }
 
@@ -123,12 +121,12 @@ const Mutation = {
 
   //   // Wrong sequence number
   //   if (sequence_number !== sequenceNumber) {
-  //     throw new Error('Wrong sequence number, transfer failed.')
+  //     throw new Error("Wrong sequence number, transfer failed.")
   //   }
 
   //   // Not enough balance
   //   if (amount * 1000000 > balance) {
-  //     throw new Error('Not enough balance.')
+  //     throw new Error("Not enough balance.")
   //   }
 
   //   // Pass all above checks, processing to transfer
@@ -151,7 +149,6 @@ const Mutation = {
   //   })
 
   //   const signedTxn = transferTxn.signTransaction(secretKey)
-  //   // const signedTxn = transferTxn.signTransaction(mnemonic)
 
   //   const response = await libra.transferMoney({
   //     signedTxn,
@@ -185,15 +182,15 @@ const Mutation = {
   //       const { event_data } = event
 
   //       if (from_account === event_data.address) {
-  //         event_data.event_type = 'sent'
+  //         event_data.event_type = "sent"
   //       }
 
   //       if (to_account === event_data.address) {
-  //         event_data.event_type = 'received'
+  //         event_data.event_type = "received"
   //       }
   //     })
 
-  //     pubsub.publish('TRANSFERED', {
+  //     pubsub.publish("TRANSFERED", {
   //       receivedCoins: transaction_with_proof
   //     })
 

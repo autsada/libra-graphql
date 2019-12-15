@@ -17,9 +17,9 @@ class RawTransaction {
     this.sender = address
     this.sequence_number = sequenceNumber
     this.payload = program
-    this.max_gas_amount = 100000
+    this.max_gas_amount = 1000000
     this.gas_unit_price = 0
-    this.expiration_time = Math.floor(Date.now() / 1000) + 120
+    this.expiration_time = Math.floor(Date.now() / 1000) + 240
   }
 
   createRawTxnBytes() {
@@ -106,7 +106,6 @@ class RawTransaction {
     const signature = Buffer.concat([signatureBytesLen, signatureBytes])
 
     const signedTxnBytes = Buffer.concat([rawTxnBytes, publicKey, signature])
-
     return {
       txn_bytes: Uint8Array.from(signedTxnBytes)
     }
