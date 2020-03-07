@@ -1,11 +1,11 @@
-const { SmartBuffer } = require("smart-buffer")
+const { SmartBuffer } = require('smart-buffer')
 
 const decodeBlob = blob => {
   const blobReader = SmartBuffer.fromBuffer(blob)
   const state = {}
   state.pathCount = blobReader.readUInt32LE()
   state.pathLen = blobReader.readUInt32LE()
-  state.path = blobReader.readString(state.pathLen, "hex")
+  state.path = blobReader.readString(state.pathLen, 'hex')
 
   if (state.pathCount > 1) {
     for (let i = 1; i < state.pathCount; i++) {
@@ -13,13 +13,13 @@ const decodeBlob = blob => {
       state.addedValueLen1 = blobReader.readUInt32LE()
       state.addedValueLen2 = blobReader.readUInt32LE()
       state.addedPathLen = blobReader.readUInt32LE()
-      state.addedPath = blobReader.readString(state.addedPathLen, "hex")
+      state.addedPath = blobReader.readString(state.addedPathLen, 'hex')
     }
   }
 
   state.valueLen = blobReader.readUInt32LE()
   state.authLen = blobReader.readUInt32LE()
-  const authentication_key = blobReader.readString(state.authLen, "hex")
+  const authentication_key = blobReader.readString(state.authLen, 'hex')
   const balance = Number(blobReader.readBigUInt64LE()).toString()
   const delegated_key_rotation_capability =
     Number(blobReader.readUInt8()) === 1 ? true : false
@@ -27,10 +27,10 @@ const decodeBlob = blob => {
     Number(blobReader.readUInt8()) === 1 ? true : false
   const received_events_count = Number(blobReader.readBigUInt64LE())
   const receiveEventKeyLen = Number(blobReader.readUInt32LE())
-  const receiveEventKey = blobReader.readString(receiveEventKeyLen, "hex")
+  const receiveEventKey = blobReader.readString(receiveEventKeyLen, 'hex')
   const sent_events_count = Number(blobReader.readBigUInt64LE())
   const sendEventKeyLen = Number(blobReader.readUInt32LE())
-  const sendEventKey = blobReader.readString(sendEventKeyLen, "hex")
+  const sendEventKey = blobReader.readString(sendEventKeyLen, 'hex')
   const sequence_number = Number(blobReader.readBigUInt64LE())
   const aa = Number(blobReader.readBigUInt64LE())
 
@@ -57,14 +57,14 @@ const decodeBlob = blob => {
 const decodeSignedTxn = signedTxnBytes => {
   const signedTxnReader = SmartBuffer.fromBuffer(signedTxnBytes)
   const senderAddressLen = signedTxnReader.readUInt32LE()
-  const senderAddress = signedTxnReader.readString(32, "hex")
+  const senderAddress = signedTxnReader.readString(32, 'hex')
   const sequence_number = Number(signedTxnReader.readBigUInt64LE())
   const payloadType = signedTxnReader.readUInt32LE()
   const codeLen = signedTxnReader.readUInt32LE()
-  const code = signedTxnReader.readString(codeLen, "hex")
+  const code = signedTxnReader.readString(codeLen, 'hex')
   const argsLen = signedTxnReader.readUInt32LE()
   const argAddress = signedTxnReader.readUInt32LE()
-  const receiverAddress = signedTxnReader.readString(32, "hex")
+  const receiverAddress = signedTxnReader.readString(32, 'hex')
   const argAmount = signedTxnReader.readUInt32LE()
   const amount = Number(signedTxnReader.readBigUInt64LE()).toString()
   const max_gas_amount = Number(signedTxnReader.readBigUInt64LE())
@@ -77,9 +77,9 @@ const decodeSignedTxn = signedTxnBytes => {
   const expiration_time = Number(signedTxnReader.readBigUInt64LE()).toString()
 
   const senderPubKeyLen = signedTxnReader.readUInt32LE()
-  const sender_public_key = signedTxnReader.readString(senderPubKeyLen, "hex")
+  const sender_public_key = signedTxnReader.readString(senderPubKeyLen, 'hex')
   const signatureLen = signedTxnReader.readUInt32LE()
-  const signature = signedTxnReader.readString(signatureLen, "hex")
+  const signature = signedTxnReader.readString(signatureLen, 'hex')
 
   const signedTxn = {
     sequence_number,
@@ -110,9 +110,9 @@ const decodeTxnInfos = infos => {
   const eventRootHashReader = SmartBuffer.fromBuffer(event_root_hash)
 
   return {
-    transaction_hash: signedHashReader.readString("hex"),
-    state_root_hash: stateRootHashReader.readString("hex"),
-    event_root_hash: eventRootHashReader.readString("hex"),
+    transaction_hash: signedHashReader.readString('hex'),
+    state_root_hash: stateRootHashReader.readString('hex'),
+    event_root_hash: eventRootHashReader.readString('hex'),
     gas_used: +gas_used,
     major_status
   }
@@ -128,7 +128,7 @@ const decodeProof = proof => {
   if (!transaction_info_to_account_proof) {
     return {
       ledger_info_to_transaction_info_proof: {
-        siblings: siblings.map(item => item.toString("hex"))
+        siblings: siblings.map(item => item.toString('hex'))
       },
       transaction_info: decodeTxnInfos(transaction_info)
     }
@@ -136,14 +136,14 @@ const decodeProof = proof => {
 
   return {
     ledger_info_to_transaction_info_proof: {
-      siblings: siblings.map(item => item.toString("hex"))
+      siblings: siblings.map(item => item.toString('hex'))
     },
     transaction_info: decodeTxnInfos(transaction_info),
     transaction_info_to_account_proof: {
       siblings: transaction_info_to_account_proof.siblings.map(item =>
-        item.toString("hex")
+        item.toString('hex')
       ),
-      leaf: transaction_info_to_account_proof.leaf.toString("hex")
+      leaf: transaction_info_to_account_proof.leaf.toString('hex')
     }
   }
 }
@@ -151,7 +151,7 @@ const decodeProof = proof => {
 const decodeEventData = eventData => {
   const eventReader = SmartBuffer.fromBuffer(eventData)
   const amount = Number(eventReader.readBigInt64LE()).toString()
-  const address = eventReader.readString(32, "hex")
+  const address = eventReader.readString(32, 'hex')
 
   return {
     amount,
@@ -180,7 +180,7 @@ const decodeEvent = event => {
   const { key, sequence_number, event_data, type_tag } = event
 
   return {
-    key: key.toString("hex"),
+    key: key.toString('hex'),
     sequence_number: +sequence_number,
     event_data: decodeEventData(event_data)
   }
@@ -213,7 +213,7 @@ const decodeLedger = ledger => {
   let responsedItems
 
   // Case of AccountStateRequest
-  if (response_items[0].response_items === "get_account_state_response") {
+  if (response_items[0].response_items === 'get_account_state_response') {
     const {
       version,
       blob,
@@ -238,7 +238,7 @@ const decodeLedger = ledger => {
   // Case of SequenceNumberRequest
   if (
     response_items[0].response_items ===
-    "get_account_transaction_by_sequence_number_response"
+    'get_account_transaction_by_sequence_number_response'
   ) {
     const {
       transaction_with_proof,
@@ -294,7 +294,7 @@ const decodeLedger = ledger => {
   // Case of EventAccessPathREquest
   if (
     response_items[0].response_items ===
-    "get_events_by_event_access_path_response"
+    'get_events_by_event_access_path_response'
   ) {
     const {
       events_with_proof,
@@ -317,7 +317,7 @@ const decodeLedger = ledger => {
   }
 
   // Case of TransactionsRequest
-  if (response_items[0].response_items == "get_transactions_response") {
+  if (response_items[0].response_items == 'get_transactions_response') {
     const {
       transactions,
       events_for_versions: { events_for_version },
@@ -346,7 +346,7 @@ const decodeLedger = ledger => {
             first_transaction_version: { value: +value },
             proof_of_first_transaction: {
               non_default_siblings: non_default_siblings.map(i =>
-                i.toString("hex")
+                i.toString('hex')
               ),
               bitmap: bitmap
             },
@@ -373,17 +373,17 @@ const decodeLedger = ledger => {
   const ledgerInfoWithSigs = {
     signatures: signatures.map(item => {
       return {
-        validator_id: item.validator_id.toString("hex"),
-        signature: item.signature.toString("hex")
+        validator_id: item.validator_id.toString('hex'),
+        signature: item.signature.toString('hex')
       }
     }),
     ledger_info: {
       version: +version,
       transaction_accumulator_hash: transaction_accumulator_hash.toString(
-        "hex"
+        'hex'
       ),
-      consensus_data_hash: consensus_data_hash.toString("hex"),
-      consensus_block_id: consensus_block_id.toString("hex"),
+      consensus_data_hash: consensus_data_hash.toString('hex'),
+      consensus_block_id: consensus_block_id.toString('hex'),
       epoch_num,
       timestamp_usecs
     }

@@ -1,9 +1,9 @@
-const path = require("path")
-const grpc = require("grpc")
-const protoLoader = require("@grpc/proto-loader")
-const axios = require("axios")
+const path = require('path')
+const grpc = require('grpc')
+const protoLoader = require('@grpc/proto-loader')
+const axios = require('axios')
 
-const protoPath = path.join(__dirname, "./", "proto/admission_control.proto")
+const protoPath = path.join(__dirname, './', 'proto/admission_control.proto')
 
 class GrpcClient {
   constructor() {
@@ -20,17 +20,17 @@ class GrpcClient {
     ).admission_control
 
     this.client = new this.testnet.AdmissionControl(
-      "ac.testnet.libra.org:8000",
+      'ac.testnet.libra.org:8000',
       grpc.credentials.createInsecure()
     )
 
-    this.faucet = "http://faucet.testnet.libra.org"
+    this.faucet = 'http://faucet.testnet.libra.org'
   }
 
   createGetAccountStateRequest(address) {
     return {
       get_account_state_request: {
-        address: Uint8Array.from(Buffer.from(address, "hex"))
+        address: Uint8Array.from(Buffer.from(address, 'hex'))
       }
     }
   }
@@ -42,7 +42,7 @@ class GrpcClient {
   }) {
     return {
       get_account_transaction_by_sequence_number_request: {
-        account: Uint8Array.from(Buffer.from(address, "hex")),
+        account: Uint8Array.from(Buffer.from(address, 'hex')),
         sequence_number: sequenceNumber,
         fetch_events: fetchEvents
       }
@@ -59,10 +59,10 @@ class GrpcClient {
     const request = {
       get_events_by_event_access_path_request: {
         access_path: {
-          address: Uint8Array.from(Buffer.from(accessPath.address, "hex")),
+          address: Uint8Array.from(Buffer.from(accessPath.address, 'hex')),
           path: Uint8Array.from(
             Buffer.concat([
-              Buffer.from(accessPath.path, "hex"),
+              Buffer.from(accessPath.path, 'hex'),
               Buffer.from(accessPath.eventType)
             ])
           )
@@ -189,7 +189,7 @@ class GrpcClient {
 
         if (callCount > 60) {
           clearInterval(query)
-          reject("Please try querying again.")
+          reject('Please try querying again.')
         }
       }, 1000)
     })
@@ -199,7 +199,7 @@ class GrpcClient {
     try {
       const url = `${this.faucet}?amount=${amount}&address=${address}`
       const response = await axios({
-        method: "post",
+        method: 'post',
         url
       })
 
@@ -245,7 +245,7 @@ class GrpcClient {
 
         if (callCount > 60) {
           clearInterval(query)
-          reject("Transfer coins failed, please try again later.")
+          reject('Transfer coins failed, please try again later.')
         }
       }, 1000)
     })
@@ -259,8 +259,8 @@ class GrpcClient {
     const { ac_status, vm_status, mempool_status } = response
 
     if (ac_status) {
-      if (ac_status.code !== "Accepted") {
-        throw new Error("Transfer failed. Please try again later")
+      if (ac_status.code !== 'Accepted') {
+        throw new Error('Transfer failed. Please try again later')
       }
       return this.waitForTxnConfirmation({
         address,
@@ -269,8 +269,8 @@ class GrpcClient {
     }
 
     if (vm_status) {
-      if (vm_status.major_status !== "3") {
-        throw new Error("Transfer failed. Please try again later")
+      if (vm_status.major_status !== '3') {
+        throw new Error('Transfer failed. Please try again later')
       }
       return this.waitForTxnConfirmation({
         address,
