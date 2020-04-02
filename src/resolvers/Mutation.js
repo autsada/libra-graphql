@@ -1,9 +1,9 @@
-const Account = require("../classes/Account")
-const RawTransaction = require("../classes/RawTransaction")
-const Program = require("../classes/Program")
-const peerToPeerCode = require("../utils/peerToPeerTxnHex")
-const AccountState = require("../classes/AccountState")
-const { decodeLedger } = require("../utils/deserialize")
+const Account = require('../classes/Account')
+const RawTransaction = require('../classes/RawTransaction')
+const Program = require('../classes/Program')
+const peerToPeerCode = require('../utils/peerToPeerTxnHex')
+const AccountState = require('../classes/AccountState')
+const { decodeLedger } = require('../utils/deserialize')
 
 const Mutation = {
   // createAccount: (parent, args, { libra }, info) => {
@@ -20,31 +20,38 @@ const Mutation = {
     return user
   },
 
-  mintCoin: async (parent, { amount, address }, { libra }, info) => {
+  mintCoin: async (parent, { amount, address, authKey }, { libra }, info) => {
     try {
       // If no amount provide
-      if (!amount || typeof amount !== "number") {
-        throw new Error("Please provide a valid amount.")
+      if (!amount || typeof amount !== 'number') {
+        throw new Error('Please provide a valid amount.')
       }
 
       // If amount is over than 1,000,000 libra, cannot process.
       if (amount * 1000000 > 1000000 * 1000000) {
-        throw new Error("Maximum amount for minting is 1,000,000 libra. ")
+        throw new Error('Maximum amount for minting is 1,000,000 libra. ')
       }
 
       // If no address, or address is in wrong format
-      if (!address || typeof address !== "string" || address.length !== 64) {
-        throw new Error("Please provide a valid address.")
+      // if (!address || typeof address !== "string" || address.length !== 64) {
+      if (!address || typeof address !== 'string' || address.length !== 32) {
+        throw new Error('Please provide a valid address.')
+      }
+
+      // Validate authKey
+      if (!authKey || typeof authKey !== 'string' || authKey.length !== 64) {
+        throw new Error('Please provide a valid authKey.')
       }
 
       // Amount is in libra, so need to convert to micro libra
       const response = await libra.mintCoins({
         amount: amount * 1000000,
-        address: address
+        address: address,
+        authKey
       })
 
       if (!response) {
-        throw new Error("Mint coins failed, please try again later")
+        throw new Error('Mint coins failed, please try again later')
       }
       const ledger = decodeLedger(response)
       const accountState = new AccountState(ledger)
@@ -217,19 +224,19 @@ const Mutation = {
     }
 
     // Check if provided arguments are in right format
-    if (typeof fromAddress !== "string" || fromAddress.length !== 64) {
+    if (typeof fromAddress !== 'string' || fromAddress.length !== 64) {
       throw new Error(`Please provide a valid sender address.`)
     }
 
-    if (typeof sequenceNumber !== "number") {
+    if (typeof sequenceNumber !== 'number') {
       throw new Error(`Please provide a valid sequence number.`)
     }
 
-    if (typeof toAddress !== "string" || toAddress.length !== 64) {
+    if (typeof toAddress !== 'string' || toAddress.length !== 32) {
       throw new Error(`Please provide a valid receiver address.`)
     }
 
-    if (!amount || typeof amount !== "number" || amount > 1000000) {
+    if (!amount || typeof amount !== 'number' || amount > 1000000) {
       throw new Error(`Please provide a valid amount.`)
     }
 
@@ -264,12 +271,12 @@ const Mutation = {
 
     // Wrong sequence number
     if (sequence_number !== sequenceNumber) {
-      throw new Error("Wrong sequence number, transfer failed.")
+      throw new Error('Wrong sequence number, transfer failed.')
     }
 
     // Not enough balance
     if (amount * 1000000 > balance) {
-      throw new Error("Not enough balance.")
+      throw new Error('Not enough balance.')
     }
 
     // Pass all above checks, processing to transfer
@@ -325,15 +332,15 @@ const Mutation = {
         const { event_data } = event
 
         if (from_account === event_data.address) {
-          event_data.event_type = "sent"
+          event_data.event_type = 'sent'
         }
 
         if (to_account === event_data.address) {
-          event_data.event_type = "received"
+          event_data.event_type = 'received'
         }
       })
 
-      pubsub.publish("TRANSFERED", {
+      pubsub.publish('TRANSFERED', {
         receivedCoins: transaction_with_proof
       })
 

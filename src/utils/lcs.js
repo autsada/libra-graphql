@@ -1,23 +1,37 @@
-const bigInt = require("big-integer")
-const { Uint64LE } = require("int64-buffer")
-const toBuffer = require("any-to-buffer")
-const BufferMaker = require("buffermaker")
+const bigInt = require('big-integer')
+const { Uint64LE } = require('int64-buffer')
+const toBuffer = require('any-to-buffer')
+const BufferMaker = require('buffermaker')
 
 const serializeBoolean = bool => toBuffer(bool)
 
-// const serializeU16 = num => {
-//   const u16Buffer = Buffer.from(
-//     Number(num)
-//       .toString(4)
-//       .padStart(4, '0')
-//       .slice(0, 4),
-//     'hex'
-//   )
-//   u16Buffer.reverse()
-//   // const buf = Buffer.allocUnsafe(4)
-//   // buf.writeUInt16LE(num)
-//   return u16Buffer
-// }
+const serializeU8 = num => {
+  const u8Buffer = Buffer.from(
+    Number(num)
+      .toString(2)
+      .padStart(2, '0')
+      .slice(0, 2),
+    'hex'
+  )
+  u8Buffer.reverse()
+  // const buf = Buffer.allocUnsafe(4)
+  // buf.writeUInt16LE(num)
+  return u8Buffer
+}
+
+const serializeU16 = num => {
+  const u16Buffer = Buffer.from(
+    Number(num)
+      .toString(4)
+      .padStart(4, '0')
+      .slice(0, 4),
+    'hex'
+  )
+  u16Buffer.reverse()
+  // const buf = Buffer.allocUnsafe(4)
+  // buf.writeUInt16LE(num)
+  return u16Buffer
+}
 
 const serializeU32 = num => new BufferMaker().UInt32LE(num).make()
 
@@ -37,7 +51,7 @@ const serializeU64 = num => {
   return buffer
 }
 
-const serializeString = (str, encode = "hex") => {
+const serializeString = (str, encode = 'hex') => {
   const strBuffer = Buffer.from(str, encode)
   const bufferLen = strBuffer.length
   const prefix = serializeU32(bufferLen)
@@ -45,7 +59,7 @@ const serializeString = (str, encode = "hex") => {
   return Buffer.concat([prefix, strBuffer])
 }
 
-const serializeAddress = (str, encode = "hex") => Buffer.from(str, encode)
+const serializeAddress = (str, encode = 'hex') => Buffer.from(str, encode)
 
 // Serialization for transaction arguments
 const serializeArgU64 = int64 => {
@@ -65,7 +79,7 @@ const serializeArgAddress = address => {
 
 const serializeArgString = str => {
   const order = serializeU32(2)
-  const strBuffer = serializeString(str, "utf8")
+  const strBuffer = serializeString(str, 'utf8')
 
   return Buffer.concat([order, strBuffer])
 }
@@ -98,6 +112,8 @@ const serializeModules = modules => {
 
 module.exports = {
   serializeBoolean,
+  serializeU8,
+  serializeU16,
   serializeU32,
   serializeU64,
   serializeString,

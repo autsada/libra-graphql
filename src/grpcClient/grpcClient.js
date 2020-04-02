@@ -195,9 +195,10 @@ class GrpcClient {
     })
   }
 
-  async mintCoins({ amount, address }) {
+  async mintCoins({ amount, address, authKey }) {
     try {
-      const url = `${this.faucet}?amount=${amount}&address=${address}`
+      // const url = `${this.faucet}?amount=${amount}&address=${address}`
+      const url = `${this.faucet}?amount=${amount}&auth_key=${authKey}`
       const response = await axios({
         method: 'post',
         url
@@ -283,8 +284,10 @@ class GrpcClient {
     return new Promise((resolve, reject) => {
       this.client.SubmitTransaction(txnRequest, (err, res) => {
         if (!err) {
+          // console.log('Res -->', res)
           resolve(res)
         }
+        // console.log('Error -->', err)
         reject(err)
       })
     })
@@ -294,8 +297,10 @@ class GrpcClient {
     return new Promise((resolve, reject) => {
       this.client.UpdateToLatestLedger(request, (err, res) => {
         if (!err) {
+          // console.log('Res -->', res.response_items)
           resolve(res)
         } else {
+          // console.log('Err -->', err)
           reject(err)
         }
       })

@@ -1,5 +1,5 @@
 // const { generateKeyPair } = require("../utils/crypto-nacl")
-const { generateAccount } = require("../utils/crypto")
+const { generateAccount } = require('../utils/crypto')
 
 // class Account {
 //   constructor() {}
@@ -24,6 +24,7 @@ class Account {
     this.address = keys.address
     this.mnemonic = keys.mnemonic
     this.publicKey = keys.publicKey
+    this.authKey = keys.authKey
   }
 }
 

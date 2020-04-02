@@ -11,7 +11,7 @@ type Query {
 
 type Mutation {
   createAccount: User
-  mintCoin(amount: Float!, address: String!): Ledger
+  mintCoin(amount: Float!, address: String!, authKey: String!): Ledger
   # transferMoney(
   #   fromAddress: String!
   #   sequenceNumber: Int!
@@ -36,6 +36,7 @@ type User {
   publicKey: String!
   address: String!
   mnemonic: String!
+  authKey: String!
   # secretKey: String!
 }
 
@@ -52,6 +53,7 @@ type Ledger {
   response_items: [ResponseItem]!
   validator_change_events: [String]!
   ledger_info_with_sigs: LedgerInfoWithSigs!
+  ledger_consistency_proof: LedgerConsistencyProof
 }
 
 type ResponseItem {
@@ -206,6 +208,10 @@ type FirstTransactionVersion {
 
 type Txn {
   type: String!
+}
+
+type LedgerConsistencyProof {
+  subtrees: [String]
 }
 
 # enum MutationType {

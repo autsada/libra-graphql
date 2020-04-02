@@ -1,6 +1,6 @@
-const AccountState = require("../classes/AccountState")
-const { decodeLedger, decodeSignedTxn } = require("../utils/deserialize")
-const accessPath = require("../utils/path")
+const AccountState = require('../classes/AccountState')
+const { decodeLedger, decodeSignedTxn } = require('../utils/deserialize')
+const accessPath = require('../utils/path')
 
 const Query = {
   // Return the account state (Ledger) of a specified account address
@@ -12,7 +12,8 @@ const Query = {
       }
 
       // Check if provided adress is in correct format
-      if (typeof address !== "string" || address.length !== 64) {
+      // if (typeof address !== "string" || address.length !== 64) {
+      if (typeof address !== 'string' || address.length !== 32) {
         throw new Error(`Please provide a valide account address.`)
       }
 
@@ -49,11 +50,11 @@ const Query = {
         throw new Error(`Please provide all required arguments.`)
       }
 
-      if (typeof address !== "string" || address.length !== 64) {
+      if (typeof address !== 'string' || address.length !== 32) {
         throw new Error(`Please provide a valid account address.`)
       }
 
-      if (typeof sequenceNumber !== "number") {
+      if (typeof sequenceNumber !== 'number') {
         throw new Error(`Please provide a valid sequence number.`)
       }
 
@@ -65,9 +66,19 @@ const Query = {
       if (
         !res.response_items[0]
           .get_account_transaction_by_sequence_number_response
-          .transaction_with_proof
       ) {
         throw new Error(`Transaction not found.`)
+      } else {
+        if (
+          !res.response_items[0]
+            .get_account_transaction_by_sequence_number_response
+            .transaction_with_proof &&
+          !res.response_items[0]
+            .get_account_transaction_by_sequence_number_response
+            .proof_of_current_sequence_number
+        ) {
+          throw new Error(`Transaction not found.`)
+        }
       }
 
       const ledger = decodeLedger(res)
@@ -78,7 +89,7 @@ const Query = {
       } = accountState.response_items[0].get_account_transaction_by_sequence_number_response
 
       if (!transaction_with_proof) {
-        throw new Error(`Transacton not found.`)
+        throw new Error(`Transacton not found!!!.`)
       }
 
       if (transaction_with_proof) {
@@ -93,16 +104,20 @@ const Query = {
           const { event_data } = event
 
           if (from_account === event_data.address) {
-            event_data.event_type = "sent"
+            event_data.event_type = 'sent'
           }
 
           if (to_account === event_data.address) {
-            event_data.event_type = "received"
+            event_data.event_type = 'received'
           }
         })
 
         return transaction_with_proof
       }
+
+      // if (proof_of_current_sequence_number) {
+      //   return proof_of_current_sequence_number
+      // }
     } catch (error) {
       // throw new Error(
       //   `Something went wrong, please check your arguments or try again later.`
@@ -120,7 +135,7 @@ const Query = {
       }
 
       // Check if provided adress is in correct format
-      if (typeof address !== "string" || address.length !== 64) {
+      if (typeof address !== 'string' || address.length !== 32) {
         throw new Error(`Please provide a valide account address.`)
       }
 
@@ -128,7 +143,7 @@ const Query = {
         accessPath: {
           address: address,
           path: accessPath,
-          eventType: "/sent_events_count/"
+          eventType: '/sent_events_count/'
         }
       })
 
@@ -140,7 +155,7 @@ const Query = {
       } = accountState.response_items[0].get_events_by_event_access_path_response
 
       events_with_proof.map(event => {
-        event.event.event_data.event_type = "sent"
+        event.event.event_data.event_type = 'sent'
       })
 
       const txnVersions = events_with_proof.map(
@@ -163,7 +178,7 @@ const Query = {
       return events_with_proof
     } catch (error) {
       throw new Error(
-        "Something went wrong, please check your arguments or try again later."
+        'Something went wrong, please check your arguments or try again later.'
       )
     }
   },
@@ -176,7 +191,7 @@ const Query = {
     }
 
     // Check if provided adress is in correct format
-    if (typeof address !== "string" || address.length !== 64) {
+    if (typeof address !== 'string' || address.length !== 32) {
       throw new Error(`Please provide a valide account address.`)
     }
 
@@ -185,7 +200,7 @@ const Query = {
         accessPath: {
           address,
           path: accessPath,
-          eventType: "/received_events_count/"
+          eventType: '/received_events_count/'
         }
       })
 
@@ -197,7 +212,7 @@ const Query = {
       } = accountState.response_items[0].get_events_by_event_access_path_response
 
       events_with_proof.map(event => {
-        event.event.event_data.event_type = "received"
+        event.event.event_data.event_type = 'received'
       })
 
       const txnVersions = events_with_proof.map(
@@ -206,7 +221,12 @@ const Query = {
 
       for (let i = 0; i < txnVersions.length; i++) {
         const res = await libra.queryOneTransaction(txnVersions[i])
-
+        // console.log(
+        //   'Txn -->',
+        //   res.response_items[0].get_transactions_response.txn_list_with_proof.transactions[0].transaction.toString(
+        //     'hex'
+        //   )
+        // )
         if (res && res.response_items[0].get_transactions_response) {
           const txnBytes =
             res.response_items[0].get_transactions_response.txn_list_with_proof
@@ -220,7 +240,7 @@ const Query = {
       return events_with_proof
     } catch (error) {
       throw new Error(
-        "Something went wrong, please check your arguments or try again later."
+        'Something went wrong, please check your arguments or try again later.'
       )
     }
   },
