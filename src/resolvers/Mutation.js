@@ -224,7 +224,7 @@ const Mutation = {
     }
 
     // Check if provided arguments are in right format
-    if (typeof fromAddress !== 'string' || fromAddress.length !== 64) {
+    if (typeof fromAddress !== 'string' || fromAddress.length !== 32) {
       throw new Error(`Please provide a valid sender address.`)
     }
 
