@@ -3,9 +3,9 @@ const EdDSA = require('elliptic').eddsa
 const { sha3_256, sha3_512 } = require('js-sha3')
 const toBuffer = require('typedarray-to-buffer')
 const bip39 = require('bip39')
+const leb = require('leb128')
 
 const { salt } = require('./salt')
-const { serializeU32 } = require('./lcs')
 
 // Generate address and mnemonic
 const generateAccount = () => {
@@ -21,12 +21,17 @@ const generateAccount = () => {
   const keyPair = ec.keyFromSecret(hashedMnemonic)
 
   const publicKeyBytes = toBuffer(keyPair.getPublic())
+
   const publicKey = publicKeyBytes.toString('hex')
 
   // auth-key = sha3-256(public-key + 0/1) // 0 means ed25519; 1 means multi-ed25519
+  const schemebytes = leb.unsigned.encode(0)
   // auth-key-prefix = auth-key[:16]  // first half 16 bytes
   // address = auth-key[16:]  // second half 16 bytes
-  const authKey = sha3_256.update(`${publicKey}0`).hex()
+
+  const authKey = sha3_256
+    .update(Buffer.concat([publicKeyBytes, schemebytes]))
+    .hex()
 
   const address = authKey.slice(32, 64)
 
@@ -34,12 +39,12 @@ const generateAccount = () => {
     address,
     publicKey,
     mnemonic,
-    authKey
+    authKey,
   }
 }
 
 // From mnemonic to private key
-const generateKeyPair = mnemonic => {
+const generateKeyPair = (mnemonic) => {
   const ec = new EdDSA('ed25519')
 
   const hashedMnemonic = sha3_512
@@ -70,12 +75,12 @@ const signTxn = ({ message, mnemonic }) => {
 
   return {
     publicKey,
-    signature
+    signature,
   }
 }
 
 module.exports = {
   generateAccount,
   generateKeyPair,
-  signTxn
+  signTxn,
 }

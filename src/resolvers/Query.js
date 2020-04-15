@@ -18,7 +18,7 @@ const Query = {
       }
 
       const res = await libra.queryAccountByAddress({
-        accountAddress: address
+        accountAddress: address,
       })
 
       if (
@@ -60,7 +60,7 @@ const Query = {
 
       const res = await libra.queryAccountBySequenceNumber({
         accountAddress: address,
-        sequenceNumber: sequenceNumber
+        sequenceNumber: sequenceNumber,
       })
 
       if (
@@ -85,7 +85,7 @@ const Query = {
       const accountState = new AccountState(ledger)
 
       const {
-        transaction_with_proof
+        transaction_with_proof,
       } = accountState.response_items[0].get_account_transaction_by_sequence_number_response
 
       if (!transaction_with_proof) {
@@ -95,12 +95,12 @@ const Query = {
       if (transaction_with_proof) {
         const {
           transaction: {
-            transaction: { from_account, to_account }
+            transaction: { from_account, to_account },
           },
-          events: { events }
+          events: { events },
         } = transaction_with_proof
 
-        events.map(event => {
+        events.map((event) => {
           const { event_data } = event
 
           if (from_account === event_data.address) {
@@ -143,23 +143,23 @@ const Query = {
         accessPath: {
           address: address,
           path: accessPath,
-          eventType: '/sent_events_count/'
-        }
+          eventType: '/sent_events_count/',
+        },
       })
 
       const ledger = decodeLedger(res)
       const accountState = new AccountState(ledger)
 
       const {
-        events_with_proof
+        events_with_proof,
       } = accountState.response_items[0].get_events_by_event_access_path_response
 
-      events_with_proof.map(event => {
+      events_with_proof.map((event) => {
         event.event.event_data.event_type = 'sent'
       })
 
       const txnVersions = events_with_proof.map(
-        event => event.transaction_version
+        (event) => event.transaction_version
       )
 
       for (let i = 0; i < txnVersions.length; i++) {
@@ -200,23 +200,23 @@ const Query = {
         accessPath: {
           address,
           path: accessPath,
-          eventType: '/received_events_count/'
-        }
+          eventType: '/received_events_count/',
+        },
       })
 
       const ledger = decodeLedger(res)
       const accountState = new AccountState(ledger)
 
       const {
-        events_with_proof
+        events_with_proof,
       } = accountState.response_items[0].get_events_by_event_access_path_response
 
-      events_with_proof.map(event => {
+      events_with_proof.map((event) => {
         event.event.event_data.event_type = 'received'
       })
 
       const txnVersions = events_with_proof.map(
-        event => event.transaction_version
+        (event) => event.transaction_version
       )
 
       for (let i = 0; i < txnVersions.length; i++) {
@@ -298,7 +298,7 @@ const Query = {
     //   })
     // })
     // return transactions
-  }
+  },
 }
 
 module.exports = Query

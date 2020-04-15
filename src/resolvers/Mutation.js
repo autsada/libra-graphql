@@ -47,7 +47,7 @@ const Mutation = {
       const response = await libra.mintCoins({
         amount: amount * 1000000,
         address: address,
-        authKey
+        authKey,
       })
 
       if (!response) {
@@ -243,7 +243,7 @@ const Mutation = {
     // Check if the address has account in the testnet, and if it has, check if it has enough balance to transfer
 
     const rawAccountState = await libra.queryAccountByAddress({
-      accountAddress: fromAddress
+      accountAddress: fromAddress,
     })
 
     // Account does not exist
@@ -265,8 +265,8 @@ const Mutation = {
 
     const {
       blob: {
-        blob: { balance, sequence_number }
-      }
+        blob: { balance, sequence_number },
+      },
     } = account.response_items[0].get_account_state_response.account_state_with_proof
 
     // Wrong sequence number
@@ -286,16 +286,17 @@ const Mutation = {
       code: peerToPeerCode.code,
       args: [
         {
-          address: toAddress
+          address: toAddress,
         },
-        { amount: amount * 1000000 }
-      ]
+        { authPrefix: '0' },
+        { amount: amount * 1000000 },
+      ],
     })
 
     const transferTxn = new RawTransaction({
       address: fromAddress,
       sequenceNumber,
-      program: txnProgram
+      program: txnProgram,
     })
 
     const signedTxn = transferTxn.signTxnWithMnemonic(mnemonic)
@@ -303,14 +304,14 @@ const Mutation = {
     const response = await libra.transferMoney({
       signedTxn,
       address: fromAddress,
-      sequenceNumber
+      sequenceNumber,
     })
 
     const ledger = decodeLedger(response)
     const accountState = new AccountState(ledger)
 
     const {
-      transaction_with_proof
+      transaction_with_proof,
     } = accountState.response_items[0].get_account_transaction_by_sequence_number_response
 
     if (!transaction_with_proof) {
@@ -320,15 +321,15 @@ const Mutation = {
     } else {
       const {
         transaction: {
-          transaction: { from_account, to_account, sequence_number }
+          transaction: { from_account, to_account, sequence_number },
         },
-        events: { events }
+        events: { events },
       } = transaction_with_proof
       if (sequenceNumber !== sequence_number) {
         throw new Error(`Transfer coins failed.`)
       }
 
-      events.map(event => {
+      events.map((event) => {
         const { event_data } = event
 
         if (from_account === event_data.address) {
@@ -341,12 +342,12 @@ const Mutation = {
       })
 
       pubsub.publish('TRANSFERED', {
-        receivedCoins: transaction_with_proof
+        receivedCoins: transaction_with_proof,
       })
 
       return transaction_with_proof
     }
-  }
+  },
 }
 
 module.exports = Mutation

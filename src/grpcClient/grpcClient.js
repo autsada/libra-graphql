@@ -2,6 +2,7 @@ const path = require('path')
 const grpc = require('grpc')
 const protoLoader = require('@grpc/proto-loader')
 const axios = require('axios')
+const toBuffer = require('typedarray-to-buffer')
 
 const protoPath = path.join(__dirname, './', 'proto/admission_control.proto')
 
@@ -12,7 +13,7 @@ class GrpcClient {
       longs: String,
       enums: String,
       defaults: true,
-      oneofs: true
+      oneofs: true,
     })
 
     this.testnet = grpc.loadPackageDefinition(
@@ -30,22 +31,22 @@ class GrpcClient {
   createGetAccountStateRequest(address) {
     return {
       get_account_state_request: {
-        address: Uint8Array.from(Buffer.from(address, 'hex'))
-      }
+        address: Uint8Array.from(Buffer.from(address, 'hex')),
+      },
     }
   }
 
   createGetAccountTransactionBySequenceNumberRequest({
     address,
     sequenceNumber,
-    fetchEvents = true
+    fetchEvents = true,
   }) {
     return {
       get_account_transaction_by_sequence_number_request: {
         account: Uint8Array.from(Buffer.from(address, 'hex')),
         sequence_number: sequenceNumber,
-        fetch_events: fetchEvents
-      }
+        fetch_events: fetchEvents,
+      },
     }
   }
 
@@ -54,7 +55,7 @@ class GrpcClient {
     // sequenceNumber = 2 ** (64 - 1),
     sequenceNumber = 0,
     ascending = true,
-    limit = 100
+    limit = 100,
   }) {
     const request = {
       get_events_by_event_access_path_request: {
@@ -63,14 +64,14 @@ class GrpcClient {
           path: Uint8Array.from(
             Buffer.concat([
               Buffer.from(accessPath.path, 'hex'),
-              Buffer.from(accessPath.eventType)
+              Buffer.from(accessPath.eventType),
             ])
-          )
+          ),
         },
         start_event_seq_num: sequenceNumber,
         ascending,
-        limit
-      }
+        limit,
+      },
     }
 
     return request
@@ -81,8 +82,8 @@ class GrpcClient {
       get_transactions_request: {
         start_version: startVersion,
         limit,
-        fetch_events: fetchEvents
-      }
+        fetch_events: fetchEvents,
+      },
     }
   }
 
@@ -93,7 +94,7 @@ class GrpcClient {
   createUpdateToLatestLedgerRequest(version, requestedItem) {
     return {
       client_known_version: version,
-      requested_items: [requestedItem]
+      requested_items: [requestedItem],
     }
   }
 
@@ -114,7 +115,7 @@ class GrpcClient {
     const sequenceNumberRequest = this.createGetAccountTransactionBySequenceNumberRequest(
       {
         address: accountAddress,
-        sequenceNumber
+        sequenceNumber,
       }
     )
     const requestItem = this.createRequestItem(sequenceNumberRequest)
@@ -128,7 +129,7 @@ class GrpcClient {
 
   queryEventsByAccessPath({ accessPath }) {
     const request = this.createGetEventsByEventAccessPathRequest({
-      accessPath
+      accessPath,
     })
     const requestItem = this.createRequestItem(request)
 
@@ -143,7 +144,7 @@ class GrpcClient {
   queryOneTransaction(version) {
     const request = this.createGetTransactionRequest({
       limit: 1,
-      startVersion: version
+      startVersion: version,
     })
     const requestItem = this.createRequestItem(request)
 
@@ -159,7 +160,7 @@ class GrpcClient {
     const request = this.createGetTransactionRequest({
       limit: 50,
       startVersion: 0,
-      fetch_events: true
+      fetch_events: true,
     })
     const requestItem = this.createRequestItem(request)
 
@@ -179,8 +180,8 @@ class GrpcClient {
         callCount++
 
         this.queryAccountByAddress({
-          accountAddress: address
-        }).then(res => {
+          accountAddress: address,
+        }).then((res) => {
           if (res) {
             clearInterval(query)
             resolve(res)
@@ -201,7 +202,7 @@ class GrpcClient {
       const url = `${this.faucet}?amount=${amount}&auth_key=${authKey}`
       const response = await axios({
         method: 'post',
-        url
+        url,
       })
 
       if (response && response.status === 200) {
@@ -227,15 +228,15 @@ class GrpcClient {
 
         this.queryAccountBySequenceNumber({
           accountAddress: address,
-          sequenceNumber: sequenceNumber
-        }).then(res => {
+          sequenceNumber: sequenceNumber,
+        }).then((res) => {
           if (
             res.response_items[0]
               .get_account_transaction_by_sequence_number_response
               .transaction_with_proof
           ) {
             const {
-              transaction: { transaction }
+              transaction: { transaction },
             } = res.response_items[0].get_account_transaction_by_sequence_number_response.transaction_with_proof
             if (transaction) {
               clearInterval(query)
@@ -255,6 +256,8 @@ class GrpcClient {
   async transferMoney({ signedTxn, address, sequenceNumber }) {
     const request = this.createSubmitTransactionRequest(signedTxn)
 
+    console.log('Signed Txn -->', toBuffer(signedTxn.txn_bytes).toString('hex'))
+
     const response = await this.submitTransaction(request)
 
     const { ac_status, vm_status, mempool_status } = response
@@ -265,7 +268,7 @@ class GrpcClient {
       }
       return this.waitForTxnConfirmation({
         address,
-        sequenceNumber
+        sequenceNumber,
       })
     }
 
@@ -275,7 +278,7 @@ class GrpcClient {
       }
       return this.waitForTxnConfirmation({
         address,
-        sequenceNumber
+        sequenceNumber,
       })
     }
   }
@@ -297,7 +300,11 @@ class GrpcClient {
     return new Promise((resolve, reject) => {
       this.client.UpdateToLatestLedger(request, (err, res) => {
         if (!err) {
-          // console.log('Res -->', res.response_items)
+          // console.log(
+          //   'Res -->',
+          //   res.response_items[0].get_account_state_response
+          //     .account_state_with_proof
+          // )
           resolve(res)
         } else {
           // console.log('Err -->', err)
