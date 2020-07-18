@@ -29,7 +29,7 @@
     "int64-buffer": "^0.99.1007",
     "js-sha3": "^0.8.0",
     "leb128": "0.0.5",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "npm-run-all": "^4.1.5",
     "protobufjs": "^6.8.8",
     "smart-buffer": "^4.1.0",
