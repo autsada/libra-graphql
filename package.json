@@ -23,7 +23,7 @@
     "dotenv": "^8.0.0",
     "elliptic": "^6.5.1",
     "graphql": "^14.4.2",
-    "graphql-cli": "^3.0.12",
+    "graphql-cli": "^4.1.0",
     "graphql-yoga": "^1.18.1",
     "grpc": "^1.22.2",
     "int64-buffer": "^0.99.1007",
